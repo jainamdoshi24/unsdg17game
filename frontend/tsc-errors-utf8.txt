@@ -1,0 +1,26 @@
+﻿src/App.tsx(2,23): error TS2307: Cannot find module './assets/react.svg' or its corresponding type declarations.
+src/App.tsx(3,22): error TS2307: Cannot find module '/vite.svg' or its corresponding type declarations.
+src/components/Badge.tsx(15,11): error TS6133: 'alpha' is declared but its value is never read.
+src/features/admin/AdminPanel.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
+src/features/auth/LoginPage.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
+src/features/auth/LoginPage.tsx(8,29): error TS2307: Cannot find module '@/services/authService' or its corresponding type declarations.
+src/features/auth/SignupPage.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
+src/features/auth/SignupPage.tsx(8,29): error TS2307: Cannot find module '@/services/authService' or its corresponding type declarations.
+src/features/dashboard/StudentDashboard.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
+src/features/dashboard/StudentDashboard.tsx(8,1): error TS6133: 'SDGIcon' is declared but its value is never read.
+src/features/dashboard/TeacherDashboard.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
+src/features/leaderboard/LeaderboardPage.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
+src/features/leaderboard/LeaderboardPage.tsx(2,25): error TS6133: 'Star' is declared but its value is never read.
+src/features/leaderboard/LeaderboardPage.tsx(5,1): error TS6133: 'Badge' is declared but its value is never read.
+src/features/leaderboard/LeaderboardPage.tsx(44,40): error TS6133: 'size' is declared but its value is never read.
+src/features/profile/ProfilePage.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
+src/features/profile/ProfilePage.tsx(59,53): error TS6133: 'Icon' is declared but its value is never read.
+src/features/simulation/SimulationGame.tsx(77,11): error TS6133: 'turnPct' is declared but its value is never read.
+src/features/simulation/SimulationGame.tsx(239,35): error TS6133: 'sdgId' is declared but its value is never read.
+src/layouts/AuthLayout.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
+src/layouts/DashboardLayout.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
+src/layouts/DashboardLayout.tsx(3,41): error TS6133: 'BookOpen' is declared but its value is never read.
+src/layouts/DashboardLayout.tsx(3,51): error TS6133: 'Settings' is declared but its value is never read.
+src/layouts/DashboardLayout.tsx(3,75): error TS6133: 'X' is declared but its value is never read.
+src/store/simStore.ts(2,27): error TS6196: 'SimAction' is declared but never used.
+src/store/simStore.ts(2,66): error TS6196: 'SdgId' is declared but never used.

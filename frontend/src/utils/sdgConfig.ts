@@ -1,0 +1,321 @@
+import type { SdgMeta, SdgId } from '@/types'
+
+export const SDG_META: SdgMeta[] = [
+    { id: 'SDG_01', number: 1, color: '#E5243B', emoji: '🏚️', shortTitle: 'No Poverty', title: 'No Poverty', description: 'End poverty in all its forms everywhere.', theme: 'Economic Budget Management' },
+    { id: 'SDG_02', number: 2, color: '#DDA63A', emoji: '🌾', shortTitle: 'Zero Hunger', title: 'Zero Hunger', description: 'End hunger, achieve food security.', theme: 'Farming & Supply Chain' },
+    { id: 'SDG_03', number: 3, color: '#4C9F38', emoji: '🏥', shortTitle: 'Good Health', title: 'Good Health & Well-Being', description: 'Ensure healthy lives for all at all ages.', theme: 'Pandemic Management (SIR Model)' },
+    { id: 'SDG_04', number: 4, color: '#C5192D', emoji: '📚', shortTitle: 'Quality Education', title: 'Quality Education', description: 'Ensure inclusive and equitable education.', theme: 'School System Management' },
+    { id: 'SDG_05', number: 5, color: '#FF3A21', emoji: '⚖️', shortTitle: 'Gender Equality', title: 'Gender Equality', description: 'Achieve gender equality for all women and girls.', theme: 'Policy Reform Simulator' },
+    { id: 'SDG_06', number: 6, color: '#26BDE2', emoji: '💧', shortTitle: 'Clean Water', title: 'Clean Water & Sanitation', description: 'Ensure access to clean water for all.', theme: 'Water Grid Management' },
+    { id: 'SDG_07', number: 7, color: '#FCC30B', emoji: '⚡', shortTitle: 'Clean Energy', title: 'Affordable & Clean Energy', description: 'Ensure access to affordable, clean energy.', theme: 'Energy Grid Balancer' },
+    { id: 'SDG_08', number: 8, color: '#A21942', emoji: '💼', shortTitle: 'Decent Work', title: 'Decent Work & Economic Growth', description: 'Promote sustained, inclusive economic growth.', theme: 'Labour Market Simulator' },
+    { id: 'SDG_09', number: 9, color: '#FD6925', emoji: '🏗️', shortTitle: 'Industry', title: 'Industry, Innovation & Infra', description: 'Build resilient infrastructure and innovation.', theme: 'City Infrastructure Planner' },
+    { id: 'SDG_10', number: 10, color: '#DD1367', emoji: '🔄', shortTitle: 'Reduced Inequalities', title: 'Reduced Inequalities', description: 'Reduce inequality within and among countries.', theme: 'Wealth Redistribution Engine' },
+    { id: 'SDG_11', number: 11, color: '#FD9D24', emoji: '🏙️', shortTitle: 'Sustainable Cities', title: 'Sustainable Cities', description: 'Make cities inclusive, safe and sustainable.', theme: 'Urban Resilience Planner' },
+    { id: 'SDG_12', number: 12, color: '#BF8B2E', emoji: '♻️', shortTitle: 'Responsible Consumption', title: 'Responsible Consumption', description: 'Ensure sustainable consumption and production.', theme: 'Circular Economy Sim' },
+    { id: 'SDG_13', number: 13, color: '#3F7E44', emoji: '🌍', shortTitle: 'Climate Action', title: 'Climate Action', description: 'Take urgent action to combat climate change.', theme: 'Carbon Emissions Balancer' },
+    { id: 'SDG_14', number: 14, color: '#0A97D9', emoji: '🐠', shortTitle: 'Life Below Water', title: 'Life Below Water', description: 'Conserve and sustainably use the oceans.', theme: 'Ocean Fisheries Manager' },
+    { id: 'SDG_15', number: 15, color: '#56C02B', emoji: '🌳', shortTitle: 'Life on Land', title: 'Life on Land', description: 'Protect, restore and promote terrestrial ecosystems.', theme: 'Forest & Land Manager' },
+    { id: 'SDG_16', number: 16, color: '#00689D', emoji: '⚖️', shortTitle: 'Peace & Justice', title: 'Peace, Justice & Institutions', description: 'Promote peaceful and inclusive societies.', theme: 'Governance Simulator' },
+    { id: 'SDG_17', number: 17, color: '#19486A', emoji: '🤝', shortTitle: 'Partnerships', title: 'Partnerships for the Goals', description: 'Strengthen global partnership for sustainable development.', theme: 'Global Partnership Engine' },
+]
+
+export const SDG_MAP: Record<SdgId, SdgMeta> = Object.fromEntries(
+    SDG_META.map(s => [s.id, s])
+) as Record<SdgId, SdgMeta>
+
+export const getSdgMeta = (id: SdgId): SdgMeta => SDG_MAP[id]
+export const getSdgColor = (id: SdgId): string => SDG_MAP[id]?.color ?? '#6366F1'
+
+// ─── Expanded SDG info for modals ────────────────────────────────────────────
+interface SdgInfo {
+    tip: string
+    howToPlay: {
+        objective: string
+        controls: string[]
+        winCondition: string
+        loseCondition: string
+        scoring: string
+    }
+    about: {
+        realWorldDesc: string
+        subGoals: string[]
+        whyItMatters: string
+        realLifeExample: string
+    }
+}
+
+export const SDG_INFO: Partial<Record<SdgId, SdgInfo>> = {
+    SDG_01: {
+        tip: 'Invest in jobs and social safety nets early — poverty compounds over time!',
+        howToPlay: {
+            objective: 'Drive the poverty rate from 40% down to under 10% within 25 turns by managing the national budget wisely.',
+            controls: ['Click action buttons to spend budget on policies', 'Watch poverty %, employment, and budget bars', 'Pause anytime to plan your next move'],
+            winCondition: 'Poverty rate ≤ 10% with budget remaining',
+            loseCondition: 'Budget reaches $0 or poverty rate hits 70%',
+            scoring: 'Score is based on final poverty rate, budget efficiency, and turns used.',
+        },
+        about: {
+            realWorldDesc: 'Over 700 million people still live in extreme poverty worldwide, surviving on less than $2.15/day.',
+            subGoals: ['Eradicate extreme poverty for all', 'Reduce poverty by at least 50% in every country', 'Implement social protection systems', 'Ensure equal rights to economic resources', 'Build resilience to economic shocks'],
+            whyItMatters: 'Poverty traps communities in cycles of hunger, poor health, and limited opportunity — breaking it affects every other SDG.',
+            realLifeExample: 'India\'s MGNREGA (rural job guarantee scheme) lifted 27 million people out of poverty in one decade.',
+        },
+    },
+    SDG_02: {
+        tip: 'Balance crop production with soil health — over-farming collapses yields in the long run.',
+        howToPlay: {
+            objective: 'Ensure food security for the region: reach food supply ≥ 90% while keeping soil health above 40.',
+            controls: ['Invest in crops, irrigation, or distribution', 'Monitor supply, demand, and soil', 'Emergency food aid is expensive — avoid it'],
+            winCondition: 'Food supply ≥ 90% and hunger index ≤ 10',
+            loseCondition: 'Hunger index > 70 or soil health = 0',
+            scoring: 'Based on final food supply, soil health score, and budget efficiency.',
+        },
+        about: {
+            realWorldDesc: '828 million people go hungry every day. At the same time, one-third of all food produced globally is wasted.',
+            subGoals: ['End hunger and malnutrition', 'Double agricultural productivity', 'Sustainable food production systems', 'Maintain genetic diversity of plants and animals', 'Increase investment in rural infrastructure'],
+            whyItMatters: 'A well-fed population is healthier, more productive, and better able to pursue education and economic opportunity.',
+            realLifeExample: 'Ethiopia\'s Productive Safety Net Programme feeds 8 million seasonal food-insecure people while building local infrastructure.',
+        },
+    },
+    SDG_03: {
+        tip: 'Vaccinate early in an outbreak — stopping spread is 10× cheaper than treating cases.',
+        howToPlay: {
+            objective: 'Control a disease outbreak: keep infected population below 5% and boost health infrastructure.',
+            controls: ['Launch vaccination drives', 'Fund hospitals and ICUs', 'Implement lockdowns (costly but effective)', 'Track infected, recovered, and susceptible'],
+            winCondition: 'Infections < 5% and healthcare capacity remains stable',
+            loseCondition: 'Hospitals overwhelmed or infected > 60%',
+            scoring: 'Based on final infected count, deaths prevented, and budget used.',
+        },
+        about: {
+            realWorldDesc: 'Preventable diseases kill over 7 million children under five annually. Universal health coverage remains out of reach for 3.5 billion people.',
+            subGoals: ['End AIDS, TB, and malaria', 'Ensure universal health coverage', 'Reduce maternal and child mortality', 'Strengthen mental health services', 'Achieve 100% access to medicines and vaccines'],
+            whyItMatters: 'Healthy people learn more, work more, and live longer — health is the foundation of all development.',
+            realLifeExample: 'Rwanda rebuilt its health system post-genocide and now has 93% health insurance coverage and nearly 100% child vaccination.',
+        },
+    },
+    SDG_04: {
+        tip: 'Teacher training pays off more than just building schools. Quality matters more than quantity.',
+        howToPlay: {
+            objective: 'Achieve 85% literacy rate and 90% school enrollment by funding education systems wisely.',
+            controls: ['Build schools or train teachers', 'Fund scholarships and free meals', 'Deploy digital learning tools', 'Monitor literacy rate and enrollment'],
+            winCondition: 'Literacy ≥ 85% and enrollment ≥ 90%',
+            loseCondition: 'Literacy drops below 30% or budget exhausted',
+            scoring: 'Based on literacy rate achieved, enrollment, and equity across genders.',
+        },
+        about: {
+            realWorldDesc: '244 million children are still out of school globally. 750 million adults can\'t read or write.',
+            subGoals: ['Free primary and secondary education for all', 'Equal access for girls and marginalized groups', 'Increase skilled technical workers', 'Eliminate gender gaps in education', 'Build inclusive learning environments'],
+            whyItMatters: 'Education is the single highest-return investment a society can make. Every extra year of schooling raises earnings by 10%.',
+            realLifeExample: 'Finland overhauled its education system in the 1970s by investing in teacher training — now consistently ranks #1 globally.',
+        },
+    },
+    SDG_05: {
+        tip: 'Legal reforms open the door — but cultural programs change minds. Both are needed.',
+        howToPlay: {
+            objective: 'Raise the gender equity index from 30 to 80+ by passing laws, funding programs, and changing social norms.',
+            controls: ['Pass equal pay legislation', 'Fund women\'s education programs', 'Launch awareness campaigns', 'Provide maternal healthcare'],
+            winCondition: 'Gender Equity Index ≥ 80',
+            loseCondition: 'Equity index falls below 10 due to backlash',
+            scoring: 'Based on final equity index, participation rate, and legislative progress.',
+        },
+        about: {
+            realWorldDesc: 'Women still earn 20% less than men globally for equal work. 1 in 3 women faces gender-based violence in their lifetime.',
+            subGoals: ['End discrimination against women', 'Eliminate gender-based violence', 'Ensure women\'s leadership in politics', 'Guarantee reproductive health rights', 'Recognize unpaid care work'],
+            whyItMatters: 'Gender equality isn\'t just fairness — economies with more women in work grow faster and are more stable.',
+            realLifeExample: 'Rwanda has the world\'s highest share of women in parliament (61%) and has seen rapid economic development as a result.',
+        },
+    },
+    SDG_06: {
+        tip: 'Water conservation is always free — invest in it before building expensive infrastructure.',
+        howToPlay: {
+            objective: 'Ensure 90% of the population has access to clean water while maintaining water quality index above 60.',
+            controls: ['Build water treatment plants', 'Repair leaking distribution pipes', 'Fund rural well projects', 'Monitor water quality and waste'],
+            winCondition: 'Water access ≥ 90% and quality index ≥ 60',
+            loseCondition: 'Water quality index drops to 0 or access falls below 20%',
+            scoring: 'Based on water access %, quality index, and budget efficiency.',
+        },
+        about: {
+            realWorldDesc: '2 billion people lack access to safe drinking water. By 2025, half the world could face water scarcity.',
+            subGoals: ['Universal safe drinking water access', 'Adequate sanitation and hygiene for all', 'Reduce water pollution', 'Increase water-use efficiency', 'Protect water-related ecosystems'],
+            whyItMatters: 'Unsafe water causes 1 million deaths annually. Girls miss school to collect it — fixing water access unlocks education and health.',
+            realLifeExample: 'Bangladesh reduced diarrheal deaths by 30% through a national arsenic-safe water program covering 1.2 million wells.',
+        },
+    },
+    SDG_07: {
+        tip: 'Solar and wind have no fuel cost — expensive upfront but they pay back fast. Don\'t rely on fossil fuels.',
+        howToPlay: {
+            objective: 'Shift the energy grid to 70%+ renewable while keeping the blackout risk below 20% and the grid stable.',
+            controls: ['Build solar/wind farms', 'Add grid storage (batteries)', 'Subsidize energy efficiency', 'Keep fossil fuels as short-term backup'],
+            winCondition: 'Renewable % ≥ 70 and blackout risk ≤ 20',
+            loseCondition: 'Blackout risk ≥ 90 or budget exhausted',
+            scoring: 'Based on renewable share, grid stability, and emissions reduced.',
+        },
+        about: {
+            realWorldDesc: '800 million people live without electricity. Energy accounts for 73% of global greenhouse gas emissions.',
+            subGoals: ['Universal electricity access', 'Double renewable energy share', 'Double energy efficiency improvement rate', 'Expand clean energy in developing nations', 'Upgrade energy infrastructure globally'],
+            whyItMatters: 'Affordable clean energy powers schools, hospitals, and factories — it\'s the backbone of every other SDG.',
+            realLifeExample: 'Costa Rica ran on 100% renewable electricity for 300+ consecutive days in 2019, proving the grid transition is possible.',
+        },
+    },
+    SDG_08: {
+        tip: 'Unemployment insurance keeps demand alive during recessions — don\'t cut it to save money.',
+        howToPlay: {
+            objective: 'Grow GDP while keeping unemployment below 5% and informal employment under 20%.',
+            controls: ['Invest in job training programs', 'Launch public works projects', 'Remove barriers to small business', 'Regulate labor markets fairly'],
+            winCondition: 'GDP growth ≥ 4% and unemployment ≤ 5%',
+            loseCondition: 'Unemployment > 40% or GDP growth negative for 3 turns',
+            scoring: 'Based on GDP growth rate, unemployment, and decent work index.',
+        },
+        about: {
+            realWorldDesc: 'Over 2 billion workers are in the informal economy with no social protection. Youth unemployment is 3× the adult rate.',
+            subGoals: ['Sustained 7% GDP growth in developing countries', 'Full and productive employment for all', 'Reduce informal employment', 'Abolish child labor by 2025', 'Protect labor rights and safe work environments'],
+            whyItMatters: 'Economic growth that leaves people behind isn\'t progress. Decent work gives people dignity and financial security.',
+            realLifeExample: 'Germany\'s dual apprenticeship system (school + work training) keeps youth unemployment below 6% — lowest in Europe.',
+        },
+    },
+    SDG_09: {
+        tip: 'Internet connectivity multiplies the impact of every other infrastructure investment you make.',
+        howToPlay: {
+            objective: 'Build city infrastructure: bring internet access to 80%+ and industrial capacity to 70+.',
+            controls: ['Build broadband networks', 'Fund manufacturing districts', 'Invest in research parks', 'Improve transport links'],
+            winCondition: 'Internet access ≥ 80% and industrial capacity ≥ 70',
+            loseCondition: 'Infrastructure index drops to 0 or budget exhausted',
+            scoring: 'Based on infrastructure index, internet access, and innovation score.',
+        },
+        about: {
+            realWorldDesc: '2.7 billion people still have no internet access. Infrastructure gaps cost developing countries up to 2% GDP annually.',
+            subGoals: ['Build resilient, inclusive infrastructure', 'Promote inclusive industrialization', 'Upgrade industries for sustainability', 'Increase research and innovation spending', 'Expand internet access globally'],
+            whyItMatters: 'Modern infrastructure connects people to markets, hospitals, and schools — it turns potential into prosperity.',
+            realLifeExample: 'South Korea\'s broadband rollout created a $40B tech industry (Samsung, LG, etc.) and lifted millions into the middle class.',
+        },
+    },
+    SDG_10: {
+        tip: 'Progressive taxation is more effective than direct cash transfers — it addresses the root, not just the symptom.',
+        howToPlay: {
+            objective: 'Reduce the Gini coefficient (inequality index) from 0.60 to below 0.35 within 25 turns.',
+            controls: ['Implement progressive tax policy', 'Create targeted social transfers', 'Fund affordable housing', 'Regulate financial markets to reduce speculation'],
+            winCondition: 'Gini index ≤ 0.35 and investor confidence ≥ 40',
+            loseCondition: 'Investor confidence drops to 0 or social unrest > 80',
+            scoring: 'Based on Gini reduction, social mobility index, and stability.',
+        },
+        about: {
+            realWorldDesc: 'The 10 richest people own more wealth than the bottom 3.1 billion combined. Income inequality is rising in 70% of countries.',
+            subGoals: ['Reduce income inequality within countries', 'Promote safe, orderly migration', 'Equal opportunity regardless of background', 'Regulate global financial markets', 'Increase developing-country voice in global institutions'],
+            whyItMatters: 'High inequality harms economic growth, social trust, and political stability — it affects everyone, not just the poor.',
+            realLifeExample: 'Denmark consistently has the world\'s lowest inequality (Gini ~0.28) through progressive taxes and universal public services.',
+        },
+    },
+    SDG_11: {
+        tip: 'Green spaces reduce both flood risk and mental health problems — they\'re not a luxury!',
+        howToPlay: {
+            objective: 'Make the city resilient: keep flood risk below 30%, air quality above 50, and livability above 70.',
+            controls: ['Build sustainable housing', 'Install flood barriers and drainage', 'Expand public transit', 'Plant urban forests and parks'],
+            winCondition: 'Livability ≥ 70, flood risk ≤ 30, air quality ≥ 50',
+            loseCondition: 'Flood risk ≥ 95 or air quality ≤ 5',
+            scoring: 'Based on livability index, flood resilience, and air quality.',
+        },
+        about: {
+            realWorldDesc: 'Over half the world (4.2 billion people) lives in cities. Urban areas produce 80% of global GDP but also 70% of emissions.',
+            subGoals: ['Safe, affordable housing for all', 'Sustainable transport systems', 'Inclusive urban planning', 'Protect cultural and natural heritage', 'Reduce cities\' environmental footprint'],
+            whyItMatters: 'How we build cities determines the future — dense, green, connected cities can dramatically lower our global footprint.',
+            realLifeExample: 'Curitiba, Brazil redesigned its city around buses instead of cars in the 1970s — now has 70% public transit use and cleaner air.',
+        },
+    },
+    SDG_12: {
+        tip: 'Circular economy design (repair/reuse) is 40% cheaper than waste management in the long run.',
+        howToPlay: {
+            objective: 'Build a circular economy: get recycling rate above 70% and reduce the waste footprint index below 30.',
+            controls: ['Launch recycling programs', 'Tax unsustainable production', 'Subsidize eco-friendly businesses', 'Run consumer education campaigns'],
+            winCondition: 'Recycling rate ≥ 70% and waste footprint ≤ 30',
+            loseCondition: 'Profit margin drops below -20 or waste index > 90',
+            scoring: 'Based on recycling rate, sustainability score, and economic stability.',
+        },
+        about: {
+            realWorldDesc: 'We produce 2.1 billion tonnes of solid waste every year. Only 13.5% gets recycled. Fashion alone produces 10% of global CO₂ emissions.',
+            subGoals: ['Sustainable management of natural resources', '50% reduction in global food waste by 2030', 'Companies adopt sustainable practices', 'Reduce harmful chemicals release', 'Sustainable public procurement policies'],
+            whyItMatters: 'We are using 1.7 Earths worth of resources per year. A circular economy can cut that dramatically while creating green jobs.',
+            realLifeExample: 'The Netherlands aims for a 100% circular economy by 2050 — already recovering 80% of construction materials.',
+        },
+    },
+    SDG_13: {
+        tip: 'Carbon tax revenue funds clean tech — it\'s not just a penalty, it\'s an investment engine.',
+        howToPlay: {
+            objective: 'Keep global temperature rise below 1.5°C by 2050: reduce emissions from 80 gigatons to below 30.',
+            controls: ['Implement carbon pricing', 'Fund renewable energy transition', 'Plant forests (carbon sinks)', 'Negotiate international climate pacts'],
+            winCondition: 'Emissions ≤ 30 GT and temperature rise ≤ 1.5°C',
+            loseCondition: 'Temperature rise > 3°C or emissions stay above 70 by turn 20',
+            scoring: 'Based on emissions reduced, temperature trajectory, and green investment.',
+        },
+        about: {
+            realWorldDesc: 'The planet is already 1.2°C warmer than pre-industrial times. We have ~7 years to halve emissions to stay below 1.5°C.',
+            subGoals: ['Strengthen climate resilience in all countries', 'Integrate climate measures into national policy', 'Improve climate education and awareness', 'Meet the $100B/year climate finance target', 'Build capacity in vulnerable nations'],
+            whyItMatters: 'Climate change threatens food systems, coastal cities, biodiversity, and human health — it\'s the defining challenge of our time.',
+            realLifeExample: 'The EU\'s Emission Trading System reduced industrial emissions by 35% in 15 years while growing the economy.',
+        },
+    },
+    SDG_14: {
+        tip: 'Marine protected areas (no-fishing zones) actually increase nearby fish yields — let the ocean recover!',
+        howToPlay: {
+            objective: 'Restore ocean health: get fish stock above 70% and coral coverage above 60% within 25 turns.',
+            controls: ['Declare marine protected areas', 'Regulate and limit fishing quotas', 'Clean up plastic pollution', 'Fund coral restoration programs'],
+            winCondition: 'Fish stock ≥ 70% and coral coverage ≥ 60%',
+            loseCondition: 'Fish stock = 0 or coral coverage = 0',
+            scoring: 'Based on fish stock recovery, coral health, and pollution reduction.',
+        },
+        about: {
+            realWorldDesc: 'Over 34% of fish stocks are overfished. Coral reefs support 25% of all marine life but have declined by 50% since 1950.',
+            subGoals: ['Reduce marine pollution', 'Protect and restore coastal ecosystems', 'End overfishing by 2030', 'Conserve 10% of coastal areas', 'Increase scientific knowledge of the ocean'],
+            whyItMatters: 'Oceans produce 50% of the oxygen we breathe, feed 3 billion people, and regulate the global climate.',
+            realLifeExample: 'The Great Barrier Reef Marine Park (Australia) allows sustainable fishing while protecting biodiversity — a model globally.',
+        },
+    },
+    SDG_15: {
+        tip: 'Paying local communities to protect forests (REDD+ model) is 5× cheaper than reforestation.',
+        howToPlay: {
+            objective: 'Reverse deforestation: grow forest cover from 20% to 60% and raise biodiversity index above 70.',
+            controls: ['Fund reforestation drives', 'Ban illegal logging', 'Pay communities to protect forests', 'Create wildlife corridors'],
+            winCondition: 'Forest cover ≥ 60% and biodiversity index ≥ 70',
+            loseCondition: 'Forest cover ≤ 5% or biodiversity index ≤ 5',
+            scoring: 'Based on forest cover gained, biodiversity index, and species saved.',
+        },
+        about: {
+            realWorldDesc: 'We lose 10 million hectares of forest every year. 1 million animal and plant species face extinction — the worst rate since dinosaurs.',
+            subGoals: ['Halt deforestation and restore forests', 'End poaching and illegal wildlife trade', 'Prevent invasive alien species', 'Integrate ecosystem values into planning', 'Mobilize resources for biodiversity'],
+            whyItMatters: 'Forests house 80% of terrestrial species, absorb 30% of our CO₂, and provide clean water to billions.',
+            realLifeExample: 'Costa Rica reversed deforestation and grew forest cover from 21% to 60% in 30 years, now earning more from ecotourism than logging.',
+        },
+    },
+    SDG_16: {
+        tip: 'Corruption doesn\'t just steal money — it destroys public trust, which takes decades to rebuild.',
+        howToPlay: {
+            objective: 'Strengthen governance: push the rule of law index above 75 and reduce corruption below 20.',
+            controls: ['Pass anti-corruption legislation', 'Fund independent judiciary', 'Protect journalists and whistleblowers', 'Expand civic participation programs'],
+            winCondition: 'Rule of Law ≥ 75 and corruption index ≤ 20',
+            loseCondition: 'Public trust falls to 0 or conflict escalates to 90',
+            scoring: 'Based on rule of law, corruption reduction, and civil liberties index.',
+        },
+        about: {
+            realWorldDesc: 'Corruption costs the global economy $3.6 trillion per year. Over 2 billion people live under authoritarian rule.',
+            subGoals: ['Significantly reduce all violence', 'End abuse, trafficking, and torture', 'Promote rule of law and equal justice', 'Reduce financial crimes and corruption', 'Develop transparent, accountable institutions'],
+            whyItMatters: 'Without peace and strong institutions, no other SDG can be sustained — conflict destroys schools, hospitals, and economies.',
+            realLifeExample: 'Estonia digitized 99% of government services, dramatically reducing corruption and becoming one of Europe\'s most transparent nations.',
+        },
+    },
+    SDG_17: {
+        tip: 'Technology transfer agreements accomplish more than direct aid — they build lasting capacity.',
+        howToPlay: {
+            objective: 'Build a global partnership: increase partnership index to 80+ and unlock technology transfers to 5+ developing nations.',
+            controls: ['Sign multilateral trade deals', 'Offer technology transfer agreements', 'Contribute to international aid funds', 'Build data-sharing platforms'],
+            winCondition: 'Partnership index ≥ 80 and trade balance positive',
+            loseCondition: 'Partnership index drops to 0 or debt exceeds threshold',
+            scoring: 'Based on partnership index, aid effectiveness, and tech transfer count.',
+        },
+        about: {
+            realWorldDesc: 'Official development aid is at a record high ($204B in 2022), but still falls far short of the $4 trillion needed to meet all SDGs.',
+            subGoals: ['Strengthen domestic resource mobilization', 'Help developing countries manage debt', 'Share knowledge, technology, and data', 'Promote a universal rules-based trade system', 'Measure progress beyond just GDP'],
+            whyItMatters: 'No country can solve global challenges alone — partnerships multiply impact, share the cost, and create lasting solutions.',
+            realLifeExample: 'The COVAX program (global vaccine partnership) delivered 2 billion COVID vaccines to 146 countries, proving global collaboration works.',
+        },
+    },
+}
