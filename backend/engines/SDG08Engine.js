@@ -13,7 +13,7 @@ class SDG08Engine {
             gdpGrowth: 3 - d * 0.5,
             complianceScore: 35 - d * 5,
             informalSector: 55 + d * 5,
-            budget: 10_000_000,
+            budget: 100000000,
             jobsCreated: 0,
             turn: 0,
         };
@@ -117,6 +117,7 @@ class SDG08Engine {
         }
 
         s.turn += 1;
+        s.budget = (s.budget || 0) + 500000;
         return { newState: s, consequences: cons, events };
     }
 
@@ -125,6 +126,7 @@ class SDG08Engine {
         s.unemployment = Math.min(50, s.unemployment + 1);
         s.gdpGrowth = Math.max(-3, s.gdpGrowth - 0.1);
         s.turn += 1;
+        s.budget = (s.budget || 0) + 500000;
         return { newState: s, events: ['📉 Labour market: structural unemployment crept up. Intervene!'] };
     }
 

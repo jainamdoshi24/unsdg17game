@@ -149,11 +149,20 @@ export default function StudentDashboard() {
 
             {/* SDG World Map */}
             <div>
-                <div className="flex items-center justify-between mb-5">
-                    <h2 className="text-xl font-display font-bold text-white">SDG World Map</h2>
-                    <span className="text-sm text-brand-subtext">{completed}/17 completed</span>
+                <div className="flex items-center justify-between mb-8">
+                    <div>
+                        <h2 className="text-3xl font-display font-black text-white flex items-center gap-3">
+                            <span className="text-4xl">🎮</span> Select a Game
+                        </h2>
+                        <p className="text-sm text-brand-subtext mt-1">
+                            Note: The budget is shared across all games! Spend wisely.
+                        </p>
+                    </div>
+                    <div className="bg-brand-muted px-4 py-2 rounded-xl border border-brand-border">
+                        <span className="text-lg font-bold text-brand-primary">{completed}<span className="text-brand-subtext text-sm">/17</span></span>
+                    </div>
                 </div>
-                <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-9 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-6">
                     {SDG_META.map((sdg) => {
                         const p = progress?.sdgProgress[sdg.id]
                         const isCompleted = (p?.completions ?? 0) > 0
@@ -163,29 +172,30 @@ export default function StudentDashboard() {
                             <div
                                 key={sdg.id}
                                 onClick={() => navigate(`/play/${sdg.id}`)}
-                                className="relative flex flex-col items-center gap-1.5 cursor-pointer"
+                                className="relative flex flex-col items-center gap-3 cursor-pointer group"
                                 title={sdg.title}
                             >
                                 <div
-                                    className="w-14 h-14 rounded-2xl flex flex-col items-center justify-center font-display font-black text-white transition-all duration-200 hover:scale-110 hover:shadow-lg"
+                                    className="w-24 h-24 sm:w-28 sm:h-28 rounded-[2rem] flex flex-col items-center justify-center font-display font-black text-white transition-all duration-300 group-hover:-translate-y-2 group-hover:scale-110 group-hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)]"
                                     style={{
-                                        background: `linear-gradient(135deg, ${sdg.color}, ${sdg.color}bb)`,
-                                        boxShadow: isCompleted ? `0 0 16px ${sdg.color}66` : undefined,
+                                        background: `linear-gradient(135deg, ${sdg.color}, ${sdg.color}dd)`,
+                                        boxShadow: isCompleted ? `0 0 25px ${sdg.color}99` : `inset 0 -4px 0 rgba(0,0,0,0.2), 0 10px 20px rgba(0,0,0,0.2)`,
+                                        border: `4px solid ${sdg.color}`
                                     }}
                                 >
-                                    <span className="text-xs opacity-75">SDG</span>
-                                    <span className="text-base leading-none">{sdg.number}</span>
+                                    <span className="text-sm opacity-80 mb-1 font-bold tracking-widest uppercase">SDG</span>
+                                    <span className="text-4xl leading-none drop-shadow-lg">{sdg.number}</span>
                                 </div>
                                 {isCompleted && (
-                                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center shadow-lg">
-                                        <span className="text-white text-xs font-bold">✓</span>
+                                    <div className="absolute -top-2 -right-2 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center shadow-xl border-2 border-brand-surface z-10 animate-bounce">
+                                        <span className="text-white text-lg font-black">✓</span>
                                     </div>
                                 )}
-                                <span className="text-[10px] text-brand-subtext text-center leading-tight">
+                                <span className="text-sm font-bold text-center leading-tight mt-1 text-white group-hover:text-brand-primary transition-colors">
                                     {sdg.shortTitle}
                                 </span>
                                 {bestScore > 0 && (
-                                    <span className="text-[9px] font-bold" style={{ color: sdg.color }}>{bestScore}</span>
+                                    <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-white/10" style={{ color: sdg.color }}>Best: {bestScore}</span>
                                 )}
                             </div>
                         )

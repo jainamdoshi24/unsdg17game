@@ -17,7 +17,7 @@ class SDG13Engine {
             forestCover: 40 - d * 5,
             electricVehicleShare: 5,
             coalShare: 50 + d * 10,
-            budget: 25_000_000,
+            budget: 250000000,
             treesPlanted: 0,
             turn: 0,
         };
@@ -120,6 +120,7 @@ class SDG13Engine {
         }
 
         s.turn += 1;
+        s.budget = (s.budget || 0) + 500000;
         return { newState: s, consequences: cons, events };
     }
 
@@ -128,6 +129,7 @@ class SDG13Engine {
         s.co2Level = Math.min(130, s.co2Level + 2);
         s.forestCover = Math.max(0, s.forestCover - 0.5);
         s.turn += 1;
+        s.budget = (s.budget || 0) + 500000;
         return { newState: s, events: ['🌡️ Without policy: CO2 keeps rising. Act now!'] };
     }
 

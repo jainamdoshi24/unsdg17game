@@ -14,7 +14,7 @@ class SDG05Engine {
             mediaFreedom: 50,
             corporateCompliance: 30,
             lawsPassed: 0,
-            budget: 4_000_000,
+            budget: 40000000,
             turn: 0,
         };
     }
@@ -122,6 +122,7 @@ class SDG05Engine {
         }
 
         s.turn += 1;
+        s.budget = (s.budget || 0) + 500000;
         return { newState: s, consequences: cons, events };
     }
 
@@ -130,6 +131,7 @@ class SDG05Engine {
         s.genderEquityIndex = Math.max(0, s.genderEquityIndex - 1);
         s.publicApproval = Math.max(0, s.publicApproval - 1);
         s.turn += 1;
+        s.budget = (s.budget || 0) + 500000;
         return { newState: s, events: ['📉 Without new policy, gender equity regresses. Keep pushing!'] };
     }
 

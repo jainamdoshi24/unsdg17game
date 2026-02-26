@@ -12,7 +12,7 @@ class SDG02Engine {
             marketPrice: 100,
             wasteRatio: 25 + d * 5,
             foodSecurityIndex: 50 - d * 10,
-            budget: 800_000,
+            budget: 8000000,
             season: 1,
             fieldsIrrigated: 0,
             coldStorageBuilt: false,
@@ -114,6 +114,7 @@ class SDG02Engine {
 
         s.turn += 1;
         s.season = Math.min(25, Math.floor(s.turn / 4) + 1);
+        s.budget = (s.budget || 0) + 500000;
         return { newState: s, consequences: cons, events };
     }
 
@@ -123,6 +124,7 @@ class SDG02Engine {
         s.wasteRatio = Math.min(60, s.wasteRatio + 1);
         s.turn += 1;
         s.season = Math.min(25, Math.floor(s.turn / 4) + 1);
+        s.budget = (s.budget || 0) + 500000;
         return { newState: s, events: ['🌾 Season progresses — water level fell slightly.'] };
     }
 

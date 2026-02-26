@@ -46,6 +46,8 @@ export interface SimAction {
     label: string
     cost: number
     description?: string
+    emoji?: string
+    effect?: string
 }
 
 

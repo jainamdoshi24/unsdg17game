@@ -15,7 +15,7 @@ class SDG07Engine {
             solarFarms: 2,
             windFarms: 1,
             costPerKwh: 0.12 + d * 0.02, // currency unit
-            budget: 20_000_000,
+            budget: 200000000,
             population: 5_000_000,
             turn: 0,
         };
@@ -108,6 +108,7 @@ class SDG07Engine {
         }
 
         s.turn += 1;
+        s.budget = (s.budget || 0) + 500000;
         return { newState: s, consequences: cons, events };
     }
 
@@ -117,6 +118,7 @@ class SDG07Engine {
         s.blackoutRisk = Math.min(100, s.blackoutRisk + 2);
         s.budget = Math.max(1_000_000, s.budget - 300_000); // grid maintenance
         s.turn += 1;
+        s.budget = (s.budget || 0) + 500000;
         return { newState: s, events: ['⚡ Energy demand grew — grid pressure increased.'] };
     }
 

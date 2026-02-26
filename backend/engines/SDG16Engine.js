@@ -14,7 +14,7 @@ class SDG16Engine {
             ruleOfLaw: 35 - d * 5,
             impunityRate: 70 + d * 5,
             officialsJailed: 0,
-            budget: 12_000_000,
+            budget: 120000000,
             turn: 0,
         };
     }
@@ -119,6 +119,7 @@ class SDG16Engine {
         }
 
         s.turn += 1;
+        s.budget = (s.budget || 0) + 500000;
         return { newState: s, consequences: cons, events };
     }
 
@@ -127,6 +128,7 @@ class SDG16Engine {
         s.corruptionIndex = Math.min(10, s.corruptionIndex + 0.15);
         s.citizenTrust = Math.max(5, s.citizenTrust - 1);
         s.turn += 1;
+        s.budget = (s.budget || 0) + 500000;
         return { newState: s, events: ['🏛️ Without reform, corruption deepens and trust erodes.'] };
     }
 

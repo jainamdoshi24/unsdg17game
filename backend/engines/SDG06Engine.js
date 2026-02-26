@@ -11,7 +11,7 @@ class SDG06Engine {
             contamination: 45 + d * 10,
             infrastructure: 30 - d * 5,
             populationHealth: 55 - d * 10,
-            budget: 6_000_000,
+            budget: 60000000,
             reservoirLevel: 60 - d * 10,
             treatmentPlants: 1,
             monitoringStations: 0,
@@ -118,6 +118,7 @@ class SDG06Engine {
         }
 
         s.turn += 1;
+        s.budget = (s.budget || 0) + 500000;
         return { newState: s, consequences: cons, events };
     }
 
@@ -128,6 +129,7 @@ class SDG06Engine {
             s.waterAccess = Math.max(10, s.waterAccess - 3);
         }
         s.turn += 1;
+        s.budget = (s.budget || 0) + 500000;
         return { newState: s, events: ['💧 Reservoir depleted 3% (daily usage). Build more supply!'] };
     }
 

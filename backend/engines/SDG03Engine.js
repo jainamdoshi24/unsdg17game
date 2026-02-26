@@ -19,7 +19,7 @@ class SDG03Engine {
             economicHealth: 70 - d * 10,
             publicCompliance: 80 - d * 10,
             researchLevel: 0,
-            budget: 8_000_000,
+            budget: 80000000,
             turn: 0,
         };
     }
@@ -121,6 +121,7 @@ class SDG03Engine {
         }
 
         s.turn += 1;
+        s.budget = (s.budget || 0) + 500000;
         return { newState: s, consequences: cons, events };
     }
 
@@ -149,8 +150,8 @@ class SDG03Engine {
         this._sirStep(s, []);
         s.economicHealth = Math.max(10, s.economicHealth - 1);
         s.turn += 1;
-        return {
-            newState: s,
+        s.budget = (s.budget || 0) + 500000;
+        return { newState: s,
             events: [`📊 Status: ${s.infected.toLocaleString()} infected | ${s.deaths.toLocaleString()} deaths | ${s.recovered.toLocaleString()} recovered`],
         };
     }

@@ -70,7 +70,7 @@ router.get('/quiz', requireAuth, async (req, res) => {
         }
 
         // Random sample using aggregation
-        const questions = await Question.aggregate([
+        const questionsRaw = await Question.aggregate([
             { $match: { 'metadata.reviewStatus': 'approved', sdgId } },
             { $sample: { size: n } },
             {
@@ -78,11 +78,15 @@ router.get('/quiz', requireAuth, async (req, res) => {
                     questionId: 1,
                     sdgId: 1,
                     content: 1,
-                    correctIndex: 1,
                     difficulty: 1,
                 }
             },
         ]);
+
+        const questions = questionsRaw.map(q => ({
+            ...q,
+            correctIndex: q.content.choices.findIndex(c => c.isCorrect)
+        }));
 
         res.json({ questions, total: questions.length });
     } catch (err) {

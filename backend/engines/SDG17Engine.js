@@ -21,7 +21,7 @@ class SDG17Engine {
             technologyTransfer: 20 - d * 3,
             tradeBalance: 0,
             globalTrust: 55 - d * 5,
-            budget: 30_000_000,
+            budget: 300000000,
             fundPool: 30_000_000,
             summitsHosted: 0,
             rngSeed: seed || 'sdg17_default',
@@ -140,6 +140,7 @@ class SDG17Engine {
         }
 
         s.turn += 1;
+        s.budget = (s.budget || 0) + 500000;
         return { newState: s, consequences: cons, events };
     }
 
@@ -153,6 +154,7 @@ class SDG17Engine {
         });
         s.globalTrust = Math.max(0, s.globalTrust - 1);
         s.turn += 1;
+        s.budget = (s.budget || 0) + 500000;
         return { newState: s, events: ['🌍 Without support, partners lose alignment momentum. Intervene!'] };
     }
 

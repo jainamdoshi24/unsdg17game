@@ -16,7 +16,7 @@ class SDG15Engine {
             soilHealth: 50 - d * 8,       // 0–100
             invasiveSpecies: 20 + d * 5,      // threat index
             poachingPressure: 30 + d * 8,      // 0–100 (lower=better)
-            budget: 5_000_000,
+            budget: 50000000,
             turn: 0,
         };
     }
@@ -107,6 +107,7 @@ class SDG15Engine {
         }
 
         s.turn += 1;
+        s.budget = (s.budget || 0) + 500000;
         return { newState: s, consequences: cons, events };
     }
 
@@ -116,6 +117,7 @@ class SDG15Engine {
         s.biodiversityIndex = Math.max(0, s.biodiversityIndex - 2);
         s.soilHealth = Math.max(0, s.soilHealth - 1);
         s.turn += 1;
+        s.budget = (s.budget || 0) + 500000;
         return { newState: s, events: ['🌲 Habitat loss continued — forest and biodiversity declining.'] };
     }
 

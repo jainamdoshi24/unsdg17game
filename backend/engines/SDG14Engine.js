@@ -14,7 +14,7 @@ class SDG14Engine {
             fishingIncome: 70,           // economic livelihood index
             marinePAs: 5,            // % ocean in protected areas
             illegalFishing: 40 + d * 5,  // % of fishing activity illegal
-            budget: 5_000_000,
+            budget: 50000000,
             turn: 0,
         };
     }
@@ -106,6 +106,7 @@ class SDG14Engine {
         }
 
         s.turn += 1;
+        s.budget = (s.budget || 0) + 500000;
         return { newState: s, consequences: cons, events };
     }
 
@@ -116,6 +117,7 @@ class SDG14Engine {
         s.plasticLevel = Math.min(100, s.plasticLevel + 2);
         s.coralCoverage = Math.max(0, s.coralCoverage - 1);
         s.turn += 1;
+        s.budget = (s.budget || 0) + 500000;
         return { newState: s, events: ['🐟 Unchecked fishing and pollution: stocks fell, plastic rose, reefs bleached.'] };
     }
 

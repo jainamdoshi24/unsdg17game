@@ -13,7 +13,7 @@ class SDG11Engine {
             greenSpaceRatio: 8 - d * 2,    // % city area as parks/green
             urbanSprawl: 60 + d * 10,  // urban sprawl index (lower=better)
             population: 2_000_000,
-            budget: 12_000_000,
+            budget: 120000000,
             turn: 0,
         };
     }
@@ -97,6 +97,7 @@ class SDG11Engine {
         }
 
         s.turn += 1;
+        s.budget = (s.budget || 0) + 500000;
         return { newState: s, consequences: cons, events };
     }
 
@@ -105,6 +106,7 @@ class SDG11Engine {
         s.airQuality = Math.max(0, s.airQuality - 2);     // ongoing vehicle emissions
         s.urbanSprawl = Math.min(100, s.urbanSprawl + 2); // unchecked development
         s.turn += 1;
+        s.budget = (s.budget || 0) + 500000;
         return { newState: s, events: ['🌫️ Urban sprawl and traffic continued degrading air quality.'] };
     }
 

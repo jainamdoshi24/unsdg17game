@@ -1,13 +1,10 @@
 import React, { useEffect, useCallback, useRef, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import {
-    ArrowLeft, RotateCcw, Clock, Zap, Pause, Play, HelpCircle, BookOpen
+    ArrowLeft, RotateCcw, Clock, Pause, Play, HelpCircle, BookOpen
 } from 'lucide-react'
 import { useSimStore } from '@/store/simStore'
 import { simService } from '@/services/simService'
-import { Button } from '@/components/Button'
-import { Card } from '@/components/Card'
-import { ProgressBar, Badge } from '@/components/Badge'
 import { LoadingScreen } from '@/components/Spinner'
 import { SDG_MAP, SDG_INFO } from '@/utils/sdgConfig'
 import type { SdgId, SimAction } from '@/types'
@@ -43,7 +40,6 @@ export default function SimulationGame() {
     const info = SDG_INFO[sdgId as SdgId]
     const color = meta?.color ?? '#6366F1'
 
-    // ── Start session on mount ──────────────────────────────────────────────────
     useEffect(() => {
         if (!sdgId) return
         reset()
@@ -63,15 +59,11 @@ export default function SimulationGame() {
             }
         }
         go()
-
         return () => stopTicks()
     }, [sdgId])
 
-    // ── Interval helpers ────────────────────────────────────────────────────────
     function startTicks() {
-        stopTicks()  // safety: clear any stale intervals
-
-        // 1. World tick every 3 seconds
+        stopTicks()
         tickRef.current = setInterval(async () => {
             const s = sessionRef.current
             if (!s || pausedRef.current || s.status !== 'running') return
@@ -82,7 +74,6 @@ export default function SimulationGame() {
             } catch { /* silent */ }
         }, TICK_MS)
 
-        // 2. Clock + cooldown decrement every second
         clockRef.current = setInterval(() => {
             if (!pausedRef.current) {
                 incrementElapsed()
@@ -101,7 +92,6 @@ export default function SimulationGame() {
         setGameEnded(true)
     }
 
-    // ── Player action ────────────────────────────────────────────────────────────
     const handleAction = useCallback(async (action: SimAction) => {
         if (!session || isSubmitting || gameEnded) return
         if ((actionCooldowns[action.id] ?? 0) > 0) {
@@ -145,7 +135,6 @@ export default function SimulationGame() {
         toast(next ? '⏸ Paused' : '▶️ Resumed!', { duration: 1000 })
     }
 
-    // ── Guards ──────────────────────────────────────────────────────────────────
     if (isLoading || !session) return (
         <div className="min-h-screen bg-brand-surface flex items-center justify-center">
             <LoadingScreen text={`Starting ${meta?.shortTitle ?? 'SDG'} simulation…`} />
@@ -153,311 +142,265 @@ export default function SimulationGame() {
     )
 
     const isTerminal = gameEnded || (session.status !== 'running' && session.status !== undefined)
-    const elapsed = `${Math.floor(elapsedSeconds / 60)}:${String(elapsedSeconds % 60).padStart(2, '0')}`
-    const turnsLeft = (session.maxTurns ?? 25) - (session.turn ?? 0)
+
+    const CURRENCY_THEMES: Record<string, { icon: string, name: string }> = {
+        'SDG_01': { icon: '💵', name: 'Funds' },
+        'SDG_02': { icon: '🌾', name: 'Food Supply' },
+        'SDG_03': { icon: '💊', name: 'Medical Supplies' },
+        'SDG_04': { icon: '⏳', name: 'Time & Energy' },
+        'SDG_05': { icon: '📢', name: 'Influence' },
+        'SDG_06': { icon: '💧', name: 'Clean Water' },
+        'SDG_07': { icon: '⚡', name: 'Energy Credits' },
+        'SDG_08': { icon: '🪙', name: 'Investment Capital' },
+        'SDG_09': { icon: '🏗️', name: 'Construction Materials' },
+        'SDG_10': { icon: '🤝', name: 'Public Trust' },
+        'SDG_11': { icon: '🧱', name: 'City Resources' },
+        'SDG_12': { icon: '♻️', name: 'Eco-Points' },
+        'SDG_13': { icon: '🌍', name: 'Carbon Credits' },
+        'SDG_14': { icon: '🐠', name: 'Bio-Points (Ocean)' },
+        'SDG_15': { icon: '🌲', name: 'Nature Tokens' },
+        'SDG_16': { icon: '⚖️', name: 'Political Capital' },
+        'SDG_17': { icon: '🌐', name: 'Global Connections' },
+    }
+    const currency = session ? (CURRENCY_THEMES[session.sdgId] || { icon: '🪙', name: 'Budget' }) : { icon: '🪙', name: 'Budget' }
+
+    const charUrl = `https://api.dicebear.com/9.x/adventurer/svg?seed=${encodeURIComponent(meta?.shortTitle || 'hero')}&backgroundColor=transparent`
 
     return (
-        <div className="min-h-screen bg-brand-surface">
-            {/* ── STICKY HEADER ──────────────────────────────────────────── */}
-            <div className="sticky top-0 z-20 bg-brand-surface/90 backdrop-blur border-b border-brand-border">
-                <div className="max-w-5xl mx-auto px-4 py-3 flex items-center gap-4">
-                    <button onClick={handleQuit} className="p-2 rounded-xl hover:bg-white/10 text-brand-subtext hover:text-white transition-colors">
-                        <ArrowLeft size={18} />
+        <div className="h-[100dvh] w-screen relative flex flex-col font-display bg-[#87CEEB] overflow-hidden select-none">
+
+            {/* Playful Dotted Background (Zero network requests, never black) */}
+            <div className="absolute inset-0 opacity-30 pointer-events-none z-0" style={{ backgroundImage: 'radial-gradient(#ffffff 3px, transparent 3px)', backgroundSize: '30px 30px' }}></div>
+
+            {/* Top Bar (Game Header) */}
+            <div className="relative z-10 p-3 md:p-4 flex justify-between items-center pointer-events-auto bg-white/20 backdrop-blur-md border-b-[4px] border-white/40 shadow-sm">
+                <div className="flex gap-2 items-center">
+                    <button onClick={handleQuit} className="w-14 h-14 bg-[#d83b3b] border-4 border-[#8b1c1c] rounded-full text-white flex justify-center items-center shadow-lg hover:scale-105 active:translate-y-1 transition-transform">
+                        <ArrowLeft size={28} strokeWidth={3} />
                     </button>
-
-                    {/* SDG badge */}
-                    <div className="flex items-center gap-3 flex-1 min-w-0">
-                        <div
-                            className="w-10 h-10 rounded-xl flex flex-col items-center justify-center text-white font-black font-display text-xs flex-shrink-0"
-                            style={{ background: `linear-gradient(135deg, ${color}, ${color}99)` }}
-                        >
-                            <span className="text-[8px] opacity-70">SDG</span>
-                            <span className="text-sm">{meta?.number}</span>
-                        </div>
-                        <div className="min-w-0">
-                            <p className="text-sm font-bold text-white truncate">{meta?.shortTitle}</p>
-                            <p className="text-xs text-brand-subtext truncate">{meta?.theme}</p>
-                        </div>
+                    <div className="bg-[#db4b4b] border-[4px] border-[#9e2a2a] rounded-full px-6 py-2 text-white font-black text-xl md:text-2xl shadow-xl flex items-center gap-2">
+                        <span>{meta?.emoji}</span> {meta?.shortTitle}
                     </div>
+                </div>
 
-                    {/* Right side indicators */}
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                        {/* Live timer */}
-                        <div className={`flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-mono font-bold transition-colors ${isPaused ? 'bg-yellow-500/20 text-yellow-400' : 'bg-green-500/20 text-green-400'}`}>
-                            <span className={`w-1.5 h-1.5 rounded-full ${isPaused ? 'bg-yellow-400' : 'bg-green-400 animate-pulse'}`} />
-                            {elapsed}
+                <div className="flex items-center gap-4">
+                    {/* Dynamic Action Currency / Resource */}
+                    {typeof session.worldState.budget === 'number' && (
+                        <div className="hidden md:flex bg-[#f0ba3a] text-[#5c4a21] border-[4px] border-[#b07d12] rounded-full px-5 py-2 font-black text-xl shadow-xl items-center gap-2" title={currency.name}>
+                            <span className="text-2xl drop-shadow-sm">{currency.icon}</span> {(session.worldState.budget as number).toLocaleString()}
                         </div>
+                    )}
+                    {/* Turns */}
+                    <div className="hidden md:flex bg-[#4b8edb] text-white border-[4px] border-[#2a5b9e] rounded-full px-5 py-2 font-black text-xl shadow-xl items-center gap-2">
+                        <Clock size={24} strokeWidth={3} /> {session.turn}/{session.maxTurns}
+                    </div>
+                    {/* Pause */}
+                    {!isTerminal && (
+                        <button onClick={togglePause} className="w-14 h-14 bg-[#e9d28e] border-4 border-[#b59e53] rounded-2xl text-[#6b5514] flex justify-center items-center shadow-lg hover:scale-105 active:translate-y-1 transition-transform">
+                            {isPaused ? <Play size={28} fill="currentColor" /> : <Pause size={28} fill="currentColor" />}
+                        </button>
+                    )}
+                </div>
+            </div>
 
-                        {/* Turn counter */}
-                        <div className="flex items-center gap-1 text-xs text-brand-subtext">
-                            <Clock size={12} />
-                            <span className="text-white font-semibold">{session.turn ?? 0}/{session.maxTurns ?? 25}</span>
-                        </div>
+            {/* Main World Area - Completely dense layout to fill empty space */}
+            <div className="relative z-10 flex-1 flex flex-col p-2 md:p-4 pointer-events-none w-full max-w-[1600px] mx-auto overflow-hidden">
 
-                        {turnsLeft <= 5 && !isTerminal && (
-                            <span className="text-xs font-bold text-red-400 bg-red-500/20 px-2 py-1 rounded-lg">⏰ {turnsLeft} left!</span>
-                        )}
-
-                        {/* Score */}
-                        <div className="hidden sm:flex items-center gap-1 text-xs text-brand-subtext">
-                            <Zap size={12} className="text-yellow-400" />
-                            <span className="text-white font-semibold">{session.finalScore ?? '—'}</span>
-                        </div>
-
-                        {/* Pause */}
-                        {!isTerminal && (
-                            <button
-                                onClick={togglePause}
-                                className={`p-1.5 rounded-lg transition-all ${isPaused ? 'bg-yellow-500/30 text-yellow-400' : 'hover:bg-white/10 text-brand-subtext hover:text-white'}`}
-                            >
-                                {isPaused ? <Play size={15} /> : <Pause size={15} />}
+                {isTerminal ? (
+                    <div className="pointer-events-auto self-center bg-[#fdf5e6] border-[8px] border-[#d4b97a] rounded-[3rem] p-10 text-center shadow-2xl max-w-2xl animate-scale-in my-auto">
+                        <div className="text-8xl mb-4 drop-shadow-xl">{session.status === 'won' ? '🏆' : '💔'}</div>
+                        <h2 className="text-5xl font-display font-black text-[#8b5a2b] mb-2 uppercase tracking-wide">
+                            {session.status === 'won' ? 'Victory!' : 'Game Over'}
+                        </h2>
+                        <p className="text-2xl text-[#a87a42] font-bold mb-6">
+                            Score: <span className="text-[#d83b3b]">{session.finalScore ?? 0}</span>
+                        </p>
+                        <div className="flex gap-4 justify-center">
+                            <button onClick={() => navigate('/dashboard')} className="px-8 py-3 bg-[#e9d28e] border-b-[6px] border-[#b59e53] text-[#6b5514] font-black text-xl rounded-2xl hover:translate-y-1 hover:border-b-[0px] transition-all">
+                                Map
                             </button>
-                        )}
+                            <button onClick={() => { stopTicks(); window.location.reload() }} className="px-8 py-3 bg-[#db4b4b] border-b-[6px] border-[#9e2a2a] text-white font-black text-xl rounded-2xl hover:translate-y-1 hover:border-b-[0px] transition-all flex items-center gap-2">
+                                <RotateCcw size={24} strokeWidth={3} /> Replay
+                            </button>
+                        </div>
                     </div>
-                </div>
+                ) : (
+                    <div className="flex-1 flex flex-col lg:flex-row gap-4 h-full pointer-events-auto">
 
-                {/* Turn progress */}
-                <div className="max-w-5xl mx-auto px-4 pb-2">
-                    <ProgressBar value={session.turn ?? 0} max={session.maxTurns ?? 25} color={color} height={3} />
-                </div>
-            </div>
+                        {/* LEFT COLUMN: Character, Tasks, & Stats */}
+                        <div className="w-full lg:w-[40%] flex flex-col gap-4 overflow-y-auto lg:overflow-hidden pr-2 flex-shrink-0">
 
-            {/* ── FLOATING INFO BUTTONS ──────────────────────────────────── */}
-            {!isTerminal && (
-                <div className="fixed right-4 top-1/2 -translate-y-1/2 z-30 flex flex-col gap-3">
-                    <button
-                        onClick={() => setShowHowTo(true)}
-                        className="w-11 h-11 rounded-full text-white shadow-xl flex items-center justify-center transition-all hover:scale-110"
-                        style={{ background: '#22c55e' }}
-                        title="How to Play"
-                    >
-                        <HelpCircle size={18} />
-                    </button>
-                    <button
-                        onClick={() => setShowAbout(true)}
-                        className="w-11 h-11 rounded-full text-white shadow-xl flex items-center justify-center transition-all hover:scale-110"
-                        style={{ background: '#3b82f6' }}
-                        title="About this SDG"
-                    >
-                        <BookOpen size={18} />
-                    </button>
-                </div>
-            )}
-
-            {/* ── MAIN CONTENT ───────────────────────────────────────────── */}
-            <div className="max-w-5xl mx-auto px-4 py-6 grid lg:grid-cols-3 gap-5">
-
-                {/* Left column: Stats + Actions */}
-                <div className="lg:col-span-2 space-y-4">
-
-                    {/* Pause notice */}
-                    {isPaused && !isTerminal && (
-                        <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl px-4 py-3 flex items-center gap-3">
-                            <Pause size={14} className="text-yellow-400" />
-                            <span className="text-yellow-300 text-sm font-semibold">Paused — world is frozen</span>
-                            <button onClick={togglePause} className="ml-auto text-xs text-yellow-400 underline">Resume</button>
-                        </div>
-                    )}
-
-                    {/* Terminal result screen */}
-                    {isTerminal && (
-                        <div className="rounded-2xl border text-center p-8" style={{ borderColor: session.status === 'won' ? '#4C9F3866' : '#E5243B66', background: session.status === 'won' ? '#4C9F3810' : '#E5243B10' }}>
-                            <div className="text-6xl mb-3">{session.status === 'won' ? '🏆' : '💔'}</div>
-                            <h2 className="text-2xl font-display font-black text-white mb-1">
-                                {session.status === 'won' ? 'Mission Complete!' : 'Mission Failed'}
-                            </h2>
-                            <p className="text-brand-subtext text-sm mb-1">
-                                Final Score: <span className="text-3xl font-black text-white ml-1">{session.finalScore ?? 0}</span>
-                            </p>
-                            <p className="text-xs text-green-400 font-semibold mb-5">⏱ {elapsed}</p>
-                            <div className="flex gap-3 justify-center">
-                                <Button onClick={() => navigate('/dashboard')} variant="secondary">Dashboard</Button>
-                                <Button onClick={() => { stopTicks(); window.location.reload() }} leftIcon={<RotateCcw size={14} />}>
-                                    Play Again
-                                </Button>
+                            {/* Speech Bubble & Character */}
+                            <div className="bg-white border-[4px] border-[#d4b97a] rounded-2xl p-3 text-[#5c4a21] font-black shadow-lg flex flex-row items-center gap-3 relative overflow-hidden flex-shrink-0">
+                                {/* Portrait */}
+                                <div className="w-16 h-16 lg:w-20 lg:h-20 rounded-2xl border-2 border-white shadow-lg bg-gradient-to-br from-[#FFD700] to-[#FFA500] flex flex-shrink-0 items-center justify-center overflow-hidden">
+                                    <img src={charUrl} alt="NPC" className="w-full h-full object-cover scale-110" />
+                                </div>
+                                <div className="flex-1">
+                                    <h3 className="text-[#c29b47] uppercase text-[9px] tracking-widest mb-0.5">Objective</h3>
+                                    <p className="text-xs lg:text-sm leading-tight">
+                                        "{info?.howToPlay?.objective || 'Complete tasks to help the world!'}"
+                                    </p>
+                                </div>
                             </div>
-                        </div>
-                    )}
 
-                    {/* World state */}
-                    {!isTerminal && (
-                        <Card accentColor={color} padding="md" hover={false}>
-                            <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-xs font-bold text-white uppercase tracking-wider opacity-60">📊 Live World State</h3>
-                                <span className="text-xs text-green-400 flex items-center gap-1">
-                                    <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
-                                    Live
-                                </span>
-                            </div>
-                            <WorldStateGrid state={session.worldState} color={color} />
-                        </Card>
-                    )}
+                            {/* Unified Tasks Board */}
+                            <div className="flex-1 bg-[#8b5a2b] border-[4px] border-[#5e3a18] rounded-2xl p-2 md:p-3 shadow-lg flex flex-col overflow-hidden">
+                                <span className="text-[#fdf5e6] text-center font-black text-lg xl:text-xl tracking-widest mb-1 xl:mb-2 drop-shadow-md flex-shrink-0">TASKS & STATS 📋</span>
+                                <div className="flex-1 bg-[#fdf5e6] border-[3px] border-[#5e3a18] rounded-xl p-2 shadow-inner flex flex-col overflow-hidden">
+                                    <WorldStateTasks state={session.worldState} />
 
-                    {/* Actions */}
-                    {!isTerminal && (
-                        <div>
-                            <h3 className="text-xs font-bold text-white uppercase tracking-wider opacity-60 mb-3">⚡ Actions</h3>
-                            <div className="grid sm:grid-cols-2 gap-3">
-                                {(session.availableActions ?? []).map(action => (
-                                    <ActionCard
-                                        key={action.id}
-                                        action={action}
-                                        cooldown={actionCooldowns[action.id] ?? 0}
-                                        loading={isSubmitting}
-                                        color={color}
-                                        onSelect={handleAction}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-                    )}
-                </div>
-
-                {/* Right column: Events + Status */}
-                <div className="space-y-4">
-                    {/* Event feed */}
-                    <Card padding="md" hover={false}>
-                        <h3 className="text-xs font-bold text-white uppercase tracking-wider opacity-60 mb-3">📡 Live Events</h3>
-                        <div className="space-y-2 max-h-64 overflow-y-auto">
-                            {eventFeed.length === 0 ? (
-                                <p className="text-xs text-brand-subtext text-center py-6">Events will appear here…</p>
-                            ) : (
-                                eventFeed.map((e, i) => (
-                                    <div key={i} className={`text-xs p-2 rounded-lg leading-relaxed ${i === 0 ? 'bg-white/10 text-white' : 'bg-white/5 text-brand-subtext'}`}>
-                                        {e}
+                                    <div className="mt-2 flex-shrink-0">
+                                        <div className="bg-[#f4e4bc] p-1.5 rounded-xl border-2 border-[#d4b97a] text-[10px] xl:text-xs font-black text-[#5c4a21] text-center shadow-inner truncate">
+                                            {eventFeed[0] || "Awaiting news..."}
+                                        </div>
                                     </div>
-                                ))
-                            )}
-                        </div>
-                    </Card>
+                                </div>
 
-                    {/* Budget */}
-                    {typeof (session.worldState.budget) === 'number' && (
-                        <Card padding="md" hover={false}>
-                            <p className="text-xs text-brand-subtext mb-1">💰 Budget</p>
-                            <p className={`text-xl font-display font-black ${(session.worldState.budget as number) < 5_000_000 ? 'text-red-400' : 'text-white'}`}>
-                                ${((session.worldState.budget as number) / 1_000_000).toFixed(1)}M
-                            </p>
-                            <ProgressBar value={session.worldState.budget as number} max={30_000_000} color={(session.worldState.budget as number) < 5_000_000 ? '#E5243B' : color} height={5} className="mt-2" />
-                        </Card>
-                    )}
-
-                    {/* Progress card */}
-                    <Card padding="md" hover={false}>
-                        <p className="text-xs text-brand-subtext mb-2">⏱ Session</p>
-                        <div className="flex justify-between mb-2">
-                            <span className="text-sm font-semibold text-white">Turn {session.turn ?? 0} / {session.maxTurns ?? 25}</span>
-                            <span className="text-xs font-mono text-brand-subtext">{elapsed}</span>
+                                {/* Menu Links */}
+                                <div className="flex gap-2 w-full justify-center mt-2 flex-shrink-0">
+                                    <button onClick={() => setShowHowTo(true)} className="flex-1 py-1.5 bg-[#d4b97a] border-[2px] border-[#b89f66] text-[#5c4a21] rounded-lg font-black text-xs hover:scale-105 active:scale-95 transition flex justify-center items-center gap-1"><HelpCircle size={14} /> Tips</button>
+                                    <button onClick={() => setShowAbout(true)} className="flex-1 py-1.5 bg-[#4b8edb] border-[2px] border-[#2a5b9e] text-white rounded-lg font-black text-xs hover:scale-105 active:scale-95 transition flex justify-center items-center gap-1"><BookOpen size={14} /> Info</button>
+                                </div>
+                            </div>
                         </div>
-                        <ProgressBar value={session.turn ?? 0} max={session.maxTurns ?? 25} color={color} height={6} />
-                        <p className="text-xs text-brand-subtext mt-2">{turnsLeft > 0 ? `${turnsLeft} turns remaining` : 'Last turn!'}</p>
-                    </Card>
 
-                    {/* Tip */}
-                    {info?.tip && (
-                        <div className="rounded-xl border border-brand-border bg-brand-muted/50 p-3">
-                            <p className="text-xs font-bold text-brand-subtext uppercase tracking-wider mb-1">💡 Tip</p>
-                            <p className="text-xs text-brand-subtext leading-relaxed">{info.tip}</p>
+                        {/* RIGHT COLUMN: Actions Console */}
+                        <div className="w-full lg:w-[60%] flex-none bg-[#e1c699] border-[4px] border-[#c4a977] rounded-2xl p-2 md:p-3 shadow-lg flex flex-col overflow-hidden relative">
+                            <h3 className="text-[#8b5a2b] font-black text-lg lg:text-xl tracking-widest text-center uppercase mb-2 drop-shadow-sm border-b-[2px] border-[#c4a977] pb-1 flex-shrink-0">Available Actions</h3>
+
+                            {/* Action Buttons Scrolling Grid */}
+                            <div className="flex-1 overflow-hidden">
+                                <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-2 h-full pb-1" style={{ gridAutoRows: '1fr' }}>
+                                    {(session.availableActions ?? []).map((a: SimAction) => {
+                                        const disabled = isSubmitting || (a.cost > (session.worldState.budget as number)) || ((actionCooldowns[a.id] ?? 0) > 0)
+                                        const onCd = (actionCooldowns[a.id] ?? 0) > 0
+                                        return (
+                                            <div key={a.id} className="relative group h-full">
+                                                {onCd && (
+                                                    <div className="absolute inset-x-0 -top-2 flex justify-center z-10">
+                                                        <span className="bg-red-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full border border-red-800 shadow-sm animate-bounce">
+                                                            Wait {actionCooldowns[a.id]}s
+                                                        </span>
+                                                    </div>
+                                                )}
+                                                <button
+                                                    onClick={() => !disabled && handleAction(a)}
+                                                    disabled={disabled}
+                                                    className={`w-full h-full flex flex-col items-center justify-center p-2 border-[3px] rounded-2xl transition-all duration-200 shadow-[0_4px_0_rgb(0,0,0,0.2)] active:shadow-none active:translate-y-1
+                                                        ${disabled
+                                                            ? 'bg-gray-300 border-gray-400 opacity-60 cursor-not-allowed'
+                                                            : 'bg-white border-[#d4b97a] hover:bg-[#fef9e7] hover:-translate-y-0.5 hover:shadow-[0_4px_6px_rgb(0,0,0,0.2)]'}`}
+                                                >
+                                                    <div className="flex flex-col items-center justify-center w-full flex-1">
+                                                        <span className="text-2xl xl:text-3xl mb-1 drop-shadow-sm">{a.emoji || (a.cost > 0 ? '🛠️' : '📢')}</span>
+                                                        <span className="font-black text-[#5c4a21] text-[11px] xl:text-xs drop-shadow-sm leading-tight text-center block w-full px-1 break-words">{a.label}</span>
+                                                    </div>
+
+                                                    <div className="mt-1 flex flex-col w-full gap-1 items-center justify-end flex-shrink-0">
+                                                        <span className={`px-2 py-0.5 xl:py-1 rounded-md text-[10px] xl:text-xs font-black text-white shadow-inner w-full text-center ${a.cost === 0 ? 'bg-[#56cd4d] border-[2px] border-[#3ba034]' : 'bg-[#e29337] border-[2px] border-[#b07328]'}`}>
+                                                            {currency.icon} {a.cost === 0 ? 'Free' : a.cost.toLocaleString()}
+                                                        </span>
+                                                    </div>
+                                                </button>
+                                            </div>
+                                        )
+                                    })}
+                                </div>
+                            </div>
                         </div>
-                    )}
-                </div>
+
+                    </div>
+                )}
             </div>
 
-            {/* ── MODALS ─────────────────────────────────────────────────── */}
-            {showHowTo && info?.howToPlay && (
-                <InfoModal onClose={() => setShowHowTo(false)} color={color} title="How to Play" icon={<HelpCircle size={20} />} sdgMeta={meta}>
-                    <div className="space-y-4">
-                        <Sect label="🎯 Objective">{info.howToPlay.objective}</Sect>
-                        <div>
-                            <p className="text-xs font-bold mb-1.5" style={{ color }}>🕹️ Controls</p>
-                            <ul className="space-y-1">
-                                {info.howToPlay.controls.map((c, i) => (
-                                    <li key={i} className="text-sm text-brand-subtext flex gap-2"><span className="text-green-400">•</span>{c}</li>
-                                ))}
-                            </ul>
+            {
+                showHowTo && info?.howToPlay && (
+                    <InfoModal onClose={() => setShowHowTo(false)} title="How to Play" bg="#4C9F38" icon="❓">
+                        <p className="font-bold text-[#5c4a21] mb-2">{info.howToPlay.objective}</p>
+                        <ul className="list-disc pl-5 text-[#5c4a21] space-y-1 font-semibold mb-4">
+                            {info.howToPlay.controls.map((c, i) => <li key={i}>{c}</li>)}
+                        </ul>
+                        <div className="bg-[#fdf5e6] p-3 rounded-xl border-2 border-[#d4b97a]">
+                            <p className="text-green-700 font-bold">⭐ WIN: {info.howToPlay.winCondition}</p>
+                            <p className="text-red-700 font-bold mt-2">💔 LOSE: {info.howToPlay.loseCondition}</p>
                         </div>
-                        <div className="grid grid-cols-2 gap-3">
-                            <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-3">
-                                <p className="text-xs font-bold text-green-400 mb-1">🏆 Win</p>
-                                <p className="text-xs text-brand-subtext">{info.howToPlay.winCondition}</p>
-                            </div>
-                            <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3">
-                                <p className="text-xs font-bold text-red-400 mb-1">💔 Lose</p>
-                                <p className="text-xs text-brand-subtext">{info.howToPlay.loseCondition}</p>
-                            </div>
-                        </div>
-                        <Sect label="⭐ Scoring">{info.howToPlay.scoring}</Sect>
-                    </div>
-                    <Button className="w-full mt-5" onClick={() => setShowHowTo(false)} style={{ background: color }}>Got it!</Button>
-                </InfoModal>
-            )}
+                    </InfoModal>
+                )
+            }
 
-            {showAbout && info?.about && (
-                <InfoModal onClose={() => setShowAbout(false)} color={color} title={meta?.title ?? ''} icon={<BookOpen size={20} />} sdgMeta={meta}>
-                    <div className="space-y-4">
-                        <Sect label="🌍 What is it?">{info.about.realWorldDesc}</Sect>
-                        <div>
-                            <p className="text-xs font-bold mb-1.5" style={{ color }}>📌 Key Goals</p>
-                            <ul className="space-y-1.5">
-                                {info.about.subGoals.map((g, i) => (
-                                    <li key={i} className="text-sm text-brand-subtext flex gap-2">
-                                        <span className="text-yellow-400 text-xs font-bold mt-0.5">{i + 1}.</span>{g}
-                                    </li>
-                                ))}
-                            </ul>
+            {
+                showAbout && info?.about && (
+                    <InfoModal onClose={() => setShowAbout(false)} title={meta?.title ?? 'About'} bg="#19486A" icon="🌍">
+                        <p className="font-bold text-[#5c4a21] mb-2">{info.about.realWorldDesc}</p>
+                        <ul className="list-disc pl-5 text-[#5c4a21] space-y-1 font-semibold mb-4 text-sm">
+                            {info.about.subGoals.map((g, i) => <li key={i}>{g}</li>)}
+                        </ul>
+                        <div className="bg-[#e9f2fa] p-3 rounded-xl border-2 border-[#b8d4f0] font-semibold text-[#1e466b] text-sm">
+                            💡 {info.about.whyItMatters}
                         </div>
-                        <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-3">
-                            <p className="text-xs font-bold text-blue-400 mb-1">💡 Why it matters</p>
-                            <p className="text-sm text-brand-subtext">{info.about.whyItMatters}</p>
-                        </div>
-                        <div className="bg-brand-muted rounded-xl p-3">
-                            <p className="text-xs font-bold text-brand-subtext mb-1">🌐 Real example</p>
-                            <p className="text-sm text-brand-subtext">{info.about.realLifeExample}</p>
-                        </div>
-                    </div>
-                    <Button className="w-full mt-5" variant="secondary" onClick={() => setShowAbout(false)}>Close</Button>
-                </InfoModal>
-            )}
-        </div>
+                    </InfoModal>
+                )
+            }
+        </div >
     )
 }
 
-// ─── WorldStateGrid ───────────────────────────────────────────────────────────
-function WorldStateGrid({ state, color }: { state: Record<string, unknown>; color: string }) {
-    const skip = new Set(['turn', 'maxTurns', 'seed', '_researchBonus', 'population', 'rngSeed', 'rngCallCount'])
-    const entries = Object.entries(state).filter(([k, v]) => !skip.has(k) && typeof v === 'number')
+function WorldStateTasks({ state }: { state: Record<string, unknown> }) {
+    const skip = new Set(['turn', 'maxTurns', 'seed', '_researchBonus', 'population', 'rngSeed', 'rngCallCount', 'budget'])
 
-    if (entries.length === 0) return <p className="text-xs text-brand-subtext text-center py-4">Loading world data…</p>
+    // Filter out internal variables, flat counts, and non-percentage trackers 
+    const entries = Object.entries(state).filter(([k, v]) => {
+        if (skip.has(k) || typeof v !== 'number') return false
 
-    const fmt = (k: string, n: number) => {
-        if (k.toLowerCase().includes('budget') || k.toLowerCase().includes('fund')) return `$${(n / 1_000_000).toFixed(1)}M`
-        if (n > 1_000) return `${(n / 1_000).toFixed(1)}k`
-        if (Number.isInteger(n)) return `${n}`
-        return n.toFixed(1)
-    }
+        const lowered = k.toLowerCase()
+        if (lowered.includes('units')) return false
+        if (lowered.includes('farms')) return false
+        if (lowered.includes('plants')) return false
+        if (lowered.includes('cost')) return false
+        if (lowered.includes('active')) return false
+        if (lowered.includes('built')) return false
+        if (lowered.includes('capacity')) return false
+        if (lowered.includes('count')) return false
+        if (lowered.includes('score')) return false
+
+        return true
+    })
+
+    if (entries.length === 0) return <p className="text-sm text-center font-bold text-[#a87a42]">Loading tasks...</p>
+
     const getMax = (k: string, n: number) => {
-        const lk = k.toLowerCase()
-        if (lk.includes('budget') || lk.includes('fund')) return 30_000_000
         if (n <= 1) return 1
         if (n > 1_000) return Math.max(n * 1.5, 5_000)
         return 100
     }
 
     return (
-        <div className="grid grid-cols-2 gap-3">
-            {entries.slice(0, 12).map(([k, v]) => {
+        <div className="flex-1 w-full grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-2 2xl:gap-3 content-start overflow-hidden py-1">
+            {entries.map(([k, v]) => {
                 const n = v as number
                 const max = getMax(k, n)
-                const label = k.replace(/([A-Z])/g, ' $1').replace(/_/g, ' ').replace(/^\w/, c => c.toUpperCase())
-                const pct = Math.min(100, (n / max) * 100)
-                const isLow = max === 100 && pct < 20
+                let label = k.replace(/([A-Z])/g, ' $1').replace(/_/g, ' ').replace(/^\w/, c => c.toUpperCase())
+                let pct = Math.min(100, (n / max) * 100)
+                let isWarning = max === 100 && pct < 30
+
+                // Keep values normalized naturally
+                if (max > 1000) pct = Math.min(100, Math.max(10, pct))
+
                 return (
-                    <div key={k} className={`p-3 rounded-xl ${isLow ? 'bg-red-500/10 border border-red-500/20' : 'bg-white/5'}`}>
-                        <div className="flex justify-between items-center mb-1.5">
-                            <span className="text-xs text-brand-subtext truncate">{label}</span>
-                            <span className={`text-xs font-bold ${isLow ? 'text-red-400' : 'text-white'}`}>{fmt(k, n)}</span>
+                    <div key={k} className="flex flex-col bg-white/40 p-1.5 2xl:p-2 rounded-lg border-2 border-[#e3cca0]">
+                        <div className="flex justify-between items-end mb-1 w-full">
+                            <span className="font-black text-[#5c4a21] uppercase text-[10px] 2xl:text-xs tracking-wide flex items-center gap-1 truncate pr-1">
+                                {isWarning && <span className="text-red-500 animate-pulse">⚠️</span>} {label}
+                            </span>
+                            <span className="font-black text-[#8b5a2b] text-[10px] 2xl:text-xs">{Math.floor(pct)}%</span>
                         </div>
-                        <ProgressBar value={Math.max(0, n)} max={Math.max(1, max)} color={isLow ? '#E5243B' : color} height={4} />
+                        <div className="h-2 2xl:h-2.5 bg-[#e3cca0] rounded-full overflow-hidden shadow-inner flex-shrink-0 border border-[#c4a977]">
+                            <div
+                                className={`h-full transition-all duration-500 ${isWarning ? 'bg-red-500' : 'bg-[#4C9F38]'}`}
+                                style={{ width: `${pct}%` }}
+                            />
+                        </div>
                     </div>
                 )
             })}
@@ -465,69 +408,75 @@ function WorldStateGrid({ state, color }: { state: Record<string, unknown>; colo
     )
 }
 
-// ─── ActionCard ────────────────────────────────────────────────────────────────
-function ActionCard({ action, cooldown, loading, color, onSelect }: {
-    action: SimAction; cooldown: number; loading: boolean; color: string; onSelect: (a: SimAction) => void
-}) {
+
+
+function GameActionButton({ action, index, cooldown, loading, onSelect }: any) {
     const onCd = cooldown > 0
+    const colors = [
+        { main: '#f0ba3a', border: '#b07d12', text: '#5c4a21' },
+        { main: '#4b8edb', border: '#2a5b9e', text: '#ffffff' },
+        { main: '#4C9F38', border: '#2d6620', text: '#ffffff' },
+        { main: '#db4b4b', border: '#9e2a2a', text: '#ffffff' }
+    ]
+    const theme = colors[index % colors.length]
+
     return (
         <button
             onClick={() => onSelect(action)}
             disabled={loading || onCd}
-            className={`relative w-full text-left p-4 rounded-xl border transition-all duration-200 overflow-hidden
+            className={`relative w-full flex-1 flex flex-col items-center justify-center p-3 md:p-4 rounded-2xl md:rounded-3xl border-b-[6px] transition-all duration-100 outline-none
                 ${onCd || loading
-                    ? 'border-brand-border bg-brand-muted opacity-60 cursor-not-allowed'
-                    : 'border-brand-border bg-brand-muted hover:bg-white/5 hover:scale-[1.01] cursor-pointer'
+                    ? 'bg-gray-400 border-gray-600 text-gray-200 opacity-80 cursor-not-allowed scale-95 border-b-[2px] mt-[4px]'
+                    : 'hover:-translate-y-1 hover:border-b-[8px] active:translate-y-1 active:border-b-[0px] active:mt-[6px] cursor-pointer'
                 }`}
+            style={!(onCd || loading) ? { backgroundColor: theme.main, borderColor: theme.border, color: theme.text } : {}}
         >
             {onCd && (
-                <div className="absolute inset-0 flex items-center justify-center bg-brand-surface/70 rounded-xl">
-                    <span className="text-sm font-bold text-brand-subtext font-mono">⏳ {cooldown}s</span>
+                <div className="absolute inset-x-0 -top-3 flex justify-center z-10">
+                    <span className="bg-red-600 text-white text-xs font-black px-3 py-1 rounded-full border-2 border-red-800 shadow-md animate-bounce">
+                        Wait {cooldown}s
+                    </span>
                 </div>
             )}
-            <p className="font-semibold text-sm text-white mb-2 leading-tight">{action.label}</p>
-            <div className="flex items-center gap-2">
-                {action.cost > 0 && (
-                    <Badge color="#FCC30B" variant="soft" size="sm">💰 ${(action.cost / 1000).toFixed(0)}k</Badge>
+
+            <div className={`w-10 h-10 md:w-14 md:h-14 rounded-full flex items-center justify-center text-xl md:text-3xl lg:mb-2 bg-black/10 border-2 border-black/10 shadow-inner`}>
+                {action.cost > 0 ? '🛠️' : '📢'}
+            </div>
+
+            <p className="font-display font-black text-xs md:text-sm text-center leading-tight min-h-[32px] md:min-h-[40px] flex items-center justify-center drop-shadow-sm mt-1">
+                {action.label}
+            </p>
+
+            <div className="mt-1 md:mt-2 text-[10px] md:text-xs font-black bg-black/20 px-2 md:px-3 py-1 rounded-full shadow-inner flex items-center gap-1">
+                {action.cost > 0 ? (
+                    <>🪙 {(action.cost / 1_000_000).toFixed(1)}M</>
+                ) : (
+                    <>FREE</>
                 )}
-                {action.cost === 0 && <Badge color="#4C9F38" variant="soft" size="sm">Free</Badge>}
             </div>
         </button>
     )
 }
 
-// ─── InfoModal ─────────────────────────────────────────────────────────────────
-function InfoModal({ children, onClose, color, title, icon, sdgMeta }: {
-    children: React.ReactNode; onClose: () => void; color: string; title: string; icon: React.ReactNode; sdgMeta: any
-}) {
+function InfoModal({ children, onClose, title, bg, icon }: any) {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
-            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
             <div
-                className="relative bg-brand-surface border border-brand-border rounded-2xl max-w-md w-full p-6 shadow-2xl overflow-y-auto max-h-[88vh]"
+                className="relative bg-[#f4e4bc] border-[8px] border-[#8b5a2b] rounded-[2rem] max-w-md w-full p-6 shadow-2xl animate-scale-in"
                 onClick={e => e.stopPropagation()}
             >
-                <div className="flex items-center gap-3 mb-5">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white flex-shrink-0" style={{ background: color }}>
+                <div className="flex items-center gap-4 mb-6 relative">
+                    <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl flex items-center justify-center text-2xl md:text-4xl shadow-md border-4 border-white/30" style={{ background: bg }}>
                         {icon}
                     </div>
-                    <div>
-                        <h2 className="font-display font-black text-white">{title}</h2>
-                        <p className="text-xs text-brand-subtext">{sdgMeta?.shortTitle} · {sdgMeta?.theme}</p>
-                    </div>
-                    <button onClick={onClose} className="ml-auto p-2 rounded-lg hover:bg-white/10 text-brand-subtext hover:text-white transition-colors">✕</button>
+                    <h2 className="font-display font-black text-2xl md:text-3xl text-[#6b5514]">{title}</h2>
+                    <button onClick={onClose} className="absolute -top-10 -right-6 md:-right-10 w-12 h-12 bg-[#db4b4b] border-[4px] border-[#9e2a2a] text-white rounded-full font-black text-xl hover:scale-110 transition-transform shadow-xl">✕</button>
                 </div>
-                {children}
+                <div className="max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar lg:hidden-scrollbar">
+                    {children}
+                </div>
             </div>
-        </div>
-    )
-}
-
-function Sect({ label, children }: { label: string; children: React.ReactNode }) {
-    return (
-        <div>
-            <p className="text-xs font-bold text-white mb-1.5">{label}</p>
-            <p className="text-sm text-brand-subtext leading-relaxed">{String(children)}</p>
         </div>
     )
 }

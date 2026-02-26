@@ -11,7 +11,7 @@ class SDG09Engine {
             industrialOutput: 40 - d * 5,
             broadbandCoverage: 20 - d * 3,
             greenInfrastructure: 10,
-            budget: 20_000_000,
+            budget: 200000000,
             constructionQueueCount: 0,
             populationServed: 30 + d * 5,
             projectsCompleted: 0,
@@ -116,6 +116,7 @@ class SDG09Engine {
         }
 
         s.turn += 1;
+        s.budget = (s.budget || 0) + 500000;
         return { newState: s, consequences: cons, events };
     }
 
@@ -123,6 +124,7 @@ class SDG09Engine {
         const s = structuredClone(state);
         s.budget = Math.max(1_000_000, s.budget - 150_000);
         s.turn += 1;
+        s.budget = (s.budget || 0) + 500000;
         return { newState: s, events: ['🔧 Infrastructure maintenance costs deducted. Keep building!'] };
     }
 

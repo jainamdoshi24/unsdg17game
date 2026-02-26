@@ -14,7 +14,7 @@ class SDG12Engine {
             profitMargin: 50 - d * 5,    // business profitability 0–100
             returnsCompliance: 10,          // % products with take-back
             sustainableSupply: 20 - d * 3, // % sustainable sourcing
-            budget: 6_000_000,
+            budget: 60000000,
             turn: 0,
         };
     }
@@ -104,6 +104,7 @@ class SDG12Engine {
         }
 
         s.turn += 1;
+        s.budget = (s.budget || 0) + 500000;
         return { newState: s, consequences: cons, events };
     }
 
@@ -112,6 +113,7 @@ class SDG12Engine {
         s.wasteGenerated = Math.min(100, s.wasteGenerated + 2);
         s.carbonFootprint = Math.min(100, s.carbonFootprint + 1);
         s.turn += 1;
+        s.budget = (s.budget || 0) + 500000;
         return { newState: s, events: ['🗑️ Consumption continued — waste and emissions crept upward.'] };
     }
 

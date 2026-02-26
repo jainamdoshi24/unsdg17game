@@ -13,7 +13,7 @@ class SDG04Engine {
             literacyRate: 40 - d * 5,
             studentCount: 2000,
             teacherSatisfaction: 60,
-            budget: 3_000_000 - d * 200_000,
+            budget: 30000000 - d * 200_000,
             term: 1,
             turn: 0,
         };
@@ -111,6 +111,7 @@ class SDG04Engine {
 
         s.turn += 1;
         s.term = Math.min(25, Math.floor(s.turn / 4) + 1);
+        s.budget = (s.budget || 0) + 500000;
         return { newState: s, consequences: cons, events };
     }
 
@@ -120,6 +121,7 @@ class SDG04Engine {
         s.dropoutRate = Math.min(60, s.dropoutRate + 1);
         s.turn += 1;
         s.term = Math.min(25, Math.floor(s.turn / 4) + 1);
+        s.budget = (s.budget || 0) + 500000;
         return { newState: s, events: ['📚 New term — learning regresses without investment.'] };
     }
 

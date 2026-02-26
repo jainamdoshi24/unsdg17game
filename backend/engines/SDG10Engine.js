@@ -14,7 +14,7 @@ class SDG10Engine {
             povertyRate: 30 + d * 5,
             wealthTop10Share: 50 + d * 5,  // % income held by top 10%
             socialSpending: 20 - d * 3,  // % of GDP
-            budget: 10_000_000,
+            budget: 100000000,
             turn: 0,
         };
     }
@@ -106,6 +106,7 @@ class SDG10Engine {
         }
 
         s.turn += 1;
+        s.budget = (s.budget || 0) + 500000;
         return { newState: s, consequences: cons, events };
     }
 
@@ -114,6 +115,7 @@ class SDG10Engine {
         s.giniCoefficient = Math.min(0.75, s.giniCoefficient + 0.01); // natural drift upward
         s.povertyRate = Math.min(60, s.povertyRate + 1);
         s.turn += 1;
+        s.budget = (s.budget || 0) + 500000;
         return { newState: s, events: ['📊 Without policy action — inequality and poverty both increased.'] };
     }
 
