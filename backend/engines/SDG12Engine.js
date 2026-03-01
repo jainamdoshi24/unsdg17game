@@ -21,13 +21,13 @@ class SDG12Engine {
 
     availableActions(state) {
         return [
-            { id: 'redesign_product', label: 'Product Redesign for Durability', cost: 800_000 },
-            { id: 'takeback_scheme', label: 'Launch Product Take-Back Programme', cost: 600_000 },
-            { id: 'recycling_infra', label: 'Build Recycling Infrastructure', cost: 1_200_000 },
-            { id: 'ecolabel', label: 'Eco-Labelling + Consumer Campaign', cost: 400_000 },
-            { id: 'clean_supply', label: 'Shift to Sustainable Supply Chain', cost: 1_000_000 },
-            { id: 'repair_cafes', label: 'Fund Community Repair Cafes', cost: 200_000 },
-            { id: 'waste_tax', label: 'Introduce Packaging Waste Tax', cost: 0 },
+            { id: 'redesign_product', label: '🛠️ Product Redesign for Durability', cost: 800_000 },
+            { id: 'takeback_scheme', label: '♻️ Launch Product Take-Back Programme', cost: 600_000 },
+            { id: 'recycling_infra', label: '🏭 Build Recycling Infrastructure', cost: 1_200_000 },
+            { id: 'ecolabel', label: '🏷️ Eco-Labelling + Consumer Campaign', cost: 400_000 },
+            { id: 'clean_supply', label: '🚛 Shift to Sustainable Supply Chain', cost: 1_000_000 },
+            { id: 'repair_cafes', label: '🪛 Fund Community Repair Cafes', cost: 200_000 },
+            { id: 'waste_tax', label: '💸 Introduce Packaging Waste Tax', cost: 0 },
         ].filter(a => a.cost <= state.budget);
     }
 

@@ -16,6 +16,7 @@ interface SdgQuizProgress {
 
 export default function QuizSection() {
     const [quizBests, setQuizBests] = useState<Record<string, number>>({})
+    const [quizStats, setQuizStats] = useState<Record<string, { attempts: number; totalCorrect: number; totalQuestions: number }>>({})
     const [sdgProgress, setSdgProgress] = useState<Record<string, { completions: number }>>({})
     const [activeQuiz, setActiveQuiz] = useState<SdgId | null>(null)
     const [isLoading, setIsLoading] = useState(true)
@@ -32,6 +33,7 @@ export default function QuizSection() {
             ])
             setSdgProgress(progRes.data.sdgProgress ?? {})
             setQuizBests(bestRes.data.quizBests ?? {})
+            setQuizStats(bestRes.data.quizStats ?? {})
         } catch { /* silently fail */ }
         finally { setIsLoading(false) }
     }
@@ -65,6 +67,7 @@ export default function QuizSection() {
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {allSdgs.map(sdg => {
                     const best = quizBests[sdg.id]
+                    const stats = quizStats[sdg.id]
                     const hasBest = best !== undefined
                     const goodScore = best && best >= 80
 
@@ -105,8 +108,9 @@ export default function QuizSection() {
                             )}
 
                             <div className="flex items-center justify-between">
-                                <div className="text-xs text-brand-subtext">
-                                    {!hasBest ? '📚 +up to 100 XP' : best >= 80 ? '🎯 Mastered!' : '🔄 Improve score'}
+                                <div className="text-xs text-brand-subtext space-y-1">
+                                    <div>{!hasBest ? '📚 +up to 100 XP' : best >= 80 ? '🎯 Mastered!' : '🔄 Improve score'}</div>
+                                    {hasBest && stats && <div className="font-medium">📝 {stats.attempts} Attempt{stats.attempts !== 1 ? 's' : ''}</div>}
                                 </div>
                                 <button
                                     className="flex items-center gap-1 text-xs font-bold px-2.5 py-1.5 rounded-lg transition-all"

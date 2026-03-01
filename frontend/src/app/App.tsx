@@ -10,6 +10,7 @@ const TeacherDashboard = React.lazy(() => import('@/features/dashboard/TeacherDa
 const AdminPanel = React.lazy(() => import('@/features/admin/AdminPanel'))
 const SimulationGame = React.lazy(() => import('@/features/simulation/SimulationGame'))
 const ProfilePage = React.lazy(() => import('@/features/profile/ProfilePage'))
+const QuizPage = React.lazy(() => import('@/features/quiz/QuizPage'))
 const AuthLayout = React.lazy(() => import('@/layouts/AuthLayout'))
 const DashboardLayout = React.lazy(() => import('@/layouts/DashboardLayout'))
 
@@ -49,6 +50,7 @@ export default function App() {
                 <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
                     <Route path="/dashboard" element={<StudentDashboard />} />
                     <Route path="/leaderboard" element={<Navigate to="/dashboard" replace />} />
+                    <Route path="/quiz" element={<QuizPage />} />
                     <Route path="/profile" element={<ProfilePage />} />
                 </Route>
 

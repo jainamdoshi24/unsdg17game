@@ -23,13 +23,13 @@ class SDG07Engine {
 
     availableActions(state) {
         return [
-            { id: 'build_solar', label: 'Build Solar Farm (+5GW)', cost: 3_000_000 },
-            { id: 'build_wind', label: 'Build Wind Farm (+3GW)', cost: 2_500_000 },
-            { id: 'build_storage', label: 'Install Battery Storage', cost: 4_000_000 },
-            { id: 'close_coal', label: 'Decommission Coal Plant', cost: 1_000_000 },
-            { id: 'smart_grid', label: 'Deploy Smart Grid Technology', cost: 2_000_000 },
-            { id: 'demand_management', label: 'Launch Demand Response Scheme', cost: 500_000 },
-            { id: 'grid_interconnect', label: 'Connect Regional Grid Lines', cost: 1_500_000 },
+            { id: 'build_solar', label: '☀️ Build Solar Farm (+5GW)', cost: 3_000_000 },
+            { id: 'build_wind', label: '🌬️ Build Wind Farm (+3GW)', cost: 2_500_000 },
+            { id: 'build_storage', label: '🔋 Install Battery Storage', cost: 4_000_000 },
+            { id: 'close_coal', label: '⛏️ Decommission Coal Plant', cost: 1_000_000 },
+            { id: 'smart_grid', label: '🔌 Deploy Smart Grid Technology', cost: 2_000_000 },
+            { id: 'demand_management', label: '🎯 Launch Demand Response Scheme', cost: 500_000 },
+            { id: 'grid_interconnect', label: '🎯 Connect Regional Grid Lines', cost: 1_500_000 },
         ].filter(a => a.cost <= state.budget);
     }
 

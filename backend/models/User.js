@@ -10,6 +10,13 @@ const SDGProgressSchema = new mongoose.Schema({
     difficultyUnlocked: { type: Number, default: 1 },
 }, { _id: false });
 
+const QuizStatsSchema = new mongoose.Schema({
+    attempts: { type: Number, default: 0 },
+    bestScore: { type: Number, default: 0 },
+    totalCorrect: { type: Number, default: 0 },
+    totalQuestions: { type: Number, default: 0 },
+}, { _id: false });
+
 const UserSchema = new mongoose.Schema({
     displayName: { type: String, required: true, trim: true },
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
@@ -41,6 +48,13 @@ const UserSchema = new mongoose.Schema({
     quizBests: {
         type: Map,
         of: Number,
+        default: {},
+    },
+
+    // Detailed tracking of accuracy and attempts per quiz
+    quizStats: {
+        type: Map,
+        of: QuizStatsSchema,
         default: {},
     },
 }, { timestamps: true });

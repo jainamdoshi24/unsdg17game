@@ -38,8 +38,8 @@ router.get('/overview', requireAuth, async (req, res) => {
             skillRating: user.skillRating,
             badges: user.badges,
             totalMissions,
-            sdgsStarted,
-            sdgsCompleted: Object.values(sdgStats).filter(v => v.missionsCompleted >= 3).length,
+            sdgsStarted: Object.values(sdgStats).filter(v => v.missionsCompleted > 0).length,
+            sdgsCompleted: Object.values(sdgStats).filter(v => v.missionsCompleted > 0).length,
             sdgProgress: sdgStats,
         });
     } catch (err) {

@@ -25,9 +25,10 @@ router.post('/submit', requireAuth, async (req, res) => {
         const results = answers.map(a => {
             const q = qMap[a.questionId];
             if (!q) return { questionId: a.questionId, correct: false };
-            const isCorrect = q.correctIndex === a.selectedIndex;
+            const correctIndex = q.content?.choices?.findIndex(c => c.isCorrect) ?? -1;
+            const isCorrect = correctIndex === a.selectedIndex && correctIndex !== -1;
             if (isCorrect) correct++;
-            return { questionId: a.questionId, correct: isCorrect, correctIndex: q.correctIndex };
+            return { questionId: a.questionId, correct: isCorrect, correctIndex };
         });
 
         const total = answers.length;
@@ -41,16 +42,34 @@ router.post('/submit', requireAuth, async (req, res) => {
 
         // Anti-farm: only award XP if this beats the user's previous best quiz score for this SDG
         const user = await User.findById(req.user.userId)
-            .select('quizBests totalXP')
+            .select('quizBests quizStats totalXP')
             .lean();
         const prevBest = user?.quizBests?.[sdgId] ?? 0;
         const scoreImproved = pct > prevBest;
         const actualXp = scoreImproved ? xpEarned : 0;
 
+        // Build stats
+        const currentStats = user?.quizStats?.[sdgId] || {
+            bestScore: 0,
+            attempts: 0,
+            totalCorrect: 0,
+            totalQuestions: 0
+        };
+
         // Update user
-        const updateOps = {};
+        const updateOps = {
+            $inc: {
+                [`quizStats.${sdgId}.attempts`]: 1,
+                [`quizStats.${sdgId}.totalCorrect`]: correct,
+                [`quizStats.${sdgId}.totalQuestions`]: total,
+            },
+            $max: {
+                [`quizStats.${sdgId}.bestScore`]: pct
+            }
+        };
+
         if (scoreImproved) {
-            updateOps.$inc = { totalXP: actualXp };
+            updateOps.$inc.totalXP = actualXp;
             updateOps.$set = { [`quizBests.${sdgId}`]: pct };
         }
 
@@ -83,8 +102,11 @@ router.post('/submit', requireAuth, async (req, res) => {
 // Returns user's best quiz scores per SDG
 router.get('/best', requireAuth, async (req, res) => {
     try {
-        const user = await User.findById(req.user.userId).select('quizBests').lean();
-        res.json({ quizBests: user?.quizBests || {} });
+        const user = await User.findById(req.user.userId).select('quizBests quizStats').lean();
+        res.json({
+            quizBests: user?.quizBests || {},
+            quizStats: user?.quizStats || {}
+        });
     } catch (err) {
         res.status(500).json({ error: 'Could not fetch quiz bests' });
     }

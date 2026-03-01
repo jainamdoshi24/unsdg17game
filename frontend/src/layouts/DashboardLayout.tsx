@@ -6,7 +6,8 @@ import { Avatar } from '@/components/Spinner'
 import { clsx } from 'clsx'
 
 const navItems = [
-    { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', roles: ['student', 'teacher', 'admin'] },
+    { to: '/dashboard', icon: LayoutDashboard, label: 'Games', roles: ['student', 'teacher', 'admin'] },
+    { to: '/quiz', icon: BookOpen, label: 'Quizzes', roles: ['student', 'teacher', 'admin'] },
     { to: '/profile', icon: User, label: 'My Progress', roles: ['student', 'teacher', 'admin'] },
     { to: '/teacher', icon: GraduationCap, label: 'My Class', roles: ['teacher', 'admin'] },
     { to: '/admin', icon: Shield, label: 'Admin', roles: ['admin'] },

@@ -21,13 +21,13 @@ class SDG14Engine {
 
     availableActions(state) {
         return [
-            { id: 'set_quota', label: 'Enforce Strict Fishing Quotas', cost: 300_000 },
-            { id: 'create_mpa', label: 'Establish Marine Protected Area', cost: 800_000 },
-            { id: 'ban_trawling', label: 'Ban Bottom Trawling', cost: 0 },
-            { id: 'plastic_cleanup', label: 'Deploy Ocean Plastic Cleanup Systems', cost: 1_200_000 },
-            { id: 'coral_restore', label: 'Coral Reef Restoration Programme', cost: 900_000 },
-            { id: 'patrol_illegal', label: 'Fund Illegal Fishing Patrol Fleet', cost: 700_000 },
-            { id: 'aquaculture', label: 'Develop Sustainable Aquaculture', cost: 600_000 },
+            { id: 'set_quota', label: '⚖️ Enforce Strict Fishing Quotas', cost: 300_000 },
+            { id: 'create_mpa', label: '🛡️ Establish Marine Protected Area', cost: 800_000 },
+            { id: 'ban_trawling', label: '🚫 Ban Bottom Trawling', cost: 0 },
+            { id: 'plastic_cleanup', label: '🧹 Deploy Ocean Plastic Cleanup Systems', cost: 1_200_000 },
+            { id: 'coral_restore', label: '🪸 Coral Reef Restoration Programme', cost: 900_000 },
+            { id: 'patrol_illegal', label: '🚤 Fund Illegal Fishing Patrol Fleet', cost: 700_000 },
+            { id: 'aquaculture', label: '🐟 Develop Sustainable Aquaculture', cost: 600_000 },
         ].filter(a => a.cost <= state.budget);
     }
 

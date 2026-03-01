@@ -21,13 +21,13 @@ class SDG10Engine {
 
     availableActions(state) {
         return [
-            { id: 'progressive_tax', label: 'Increase Progressive Tax Rate', cost: 0 },
-            { id: 'wealth_tax', label: 'Introduce Wealth Tax on Top 1%', cost: 0 },
-            { id: 'social_transfer', label: 'Universal Basic Income Pilot', cost: 3_000_000 },
-            { id: 'healthcare_free', label: 'Universal Healthcare Access', cost: 2_500_000 },
-            { id: 'housing_subsidy', label: 'Subsidised Social Housing Build', cost: 2_000_000 },
-            { id: 'trade_deal', label: 'Negotiate Equitable Trade Deal', cost: 500_000 },
-            { id: 'capital_gains', label: 'Reform Capital Gains Tax', cost: 0 },
+            { id: 'progressive_tax', label: '🎯 Increase Progressive Tax Rate', cost: 0 },
+            { id: 'wealth_tax', label: '🎯 Introduce Wealth Tax on Top 1%', cost: 0 },
+            { id: 'social_transfer', label: '🎯 Universal Basic Income Pilot', cost: 3_000_000 },
+            { id: 'healthcare_free', label: '🎯 Universal Healthcare Access', cost: 2_500_000 },
+            { id: 'housing_subsidy', label: '🎯 Subsidised Social Housing Build', cost: 2_000_000 },
+            { id: 'trade_deal', label: '🎯 Negotiate Equitable Trade Deal', cost: 500_000 },
+            { id: 'capital_gains', label: '🎯 Reform Capital Gains Tax', cost: 0 },
         ].filter(a => a.cost <= state.budget);
     }
 

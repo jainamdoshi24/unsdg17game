@@ -23,13 +23,13 @@ class SDG15Engine {
 
     availableActions(state) {
         return [
-            { id: 'protect_zone', label: 'Designate Forest Protection Zone', cost: 400_000 },
-            { id: 'restore_forest', label: 'Active Forest Restoration Programme', cost: 800_000 },
-            { id: 'rewild', label: 'Rewilding & Habitat Corridors', cost: 700_000 },
-            { id: 'logging_permit', label: 'Issue Controlled Logging Permit', cost: 0 },
-            { id: 'anti_poaching', label: 'Anti-Poaching Ranger Deployment', cost: 500_000 },
-            { id: 'invasive_control', label: 'Invasive Species Control Programme', cost: 400_000 },
-            { id: 'soil_restoration', label: 'Soil Restoration & Agroforestry', cost: 350_000 },
+            { id: 'protect_zone', label: '🛡️ Designate Forest Protection Zone', cost: 400_000 },
+            { id: 'restore_forest', label: '🌲 Active Forest Restoration Programme', cost: 800_000 },
+            { id: 'rewild', label: '🐺 Rewilding & Habitat Corridors', cost: 700_000 },
+            { id: 'logging_permit', label: '📜 Issue Controlled Logging Permit', cost: 0 },
+            { id: 'anti_poaching', label: '🚔 Anti-Poaching Ranger Deployment', cost: 500_000 },
+            { id: 'invasive_control', label: '🌿 Invasive Species Control Programme', cost: 400_000 },
+            { id: 'soil_restoration', label: '🌱 Soil Restoration & Agroforestry', cost: 350_000 },
         ].filter(a => a.cost <= state.budget);
     }
 

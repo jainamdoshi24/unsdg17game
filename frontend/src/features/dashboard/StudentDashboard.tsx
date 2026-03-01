@@ -7,21 +7,9 @@ import { Badge, ProgressBar } from '@/components/Badge'
 import { Button } from '@/components/Button'
 import { SDG_META } from '@/utils/sdgConfig'
 import QuizSection from '@/features/quiz/QuizSection'
+import { useQuery } from '@tanstack/react-query'
 import type { SdgId } from '@/types'
 import api from '@/services/api'
-
-const BADGE_DEFINITIONS: { id: string; icon: string; label: string; description: string }[] = [
-    { id: 'first_win', icon: '🏆', label: 'First Victory', description: 'Complete your first SDG simulation' },
-    { id: 'sdg_explorer', icon: '🧭', label: 'SDG Explorer', description: 'Complete 3 different SDG simulations' },
-    { id: 'all_rounder', icon: '🌍', label: 'All-Rounder', description: 'Complete 10 different SDG simulations' },
-    { id: 'climate_warrior', icon: '🌿', label: 'Climate Warrior', description: 'Complete the SDG 13 Climate Action simulation' },
-    { id: 'ocean_guardian', icon: '🐠', label: 'Ocean Guardian', description: 'Complete the SDG 14 Life Below Water simulation' },
-    { id: 'knowledge_master', icon: '🧠', label: 'Knowledge Master', description: 'Score 90% or higher on any SDG quiz' },
-    { id: 'quiz_champion', icon: '📚', label: 'Quiz Champion', description: 'Score 100% on any SDG quiz' },
-    { id: 'high_scorer', icon: '🎯', label: 'High Scorer', description: 'Achieve a simulation score of 80 or higher' },
-    { id: 'poverty_fighter', icon: '❤️', label: 'Poverty Fighter', description: 'Complete the SDG 1 No Poverty simulation' },
-    { id: 'energy_engineer', icon: '⚡', label: 'Energy Engineer', description: 'Complete the SDG 7 Clean Energy simulation' },
-]
 
 interface ProgressData {
     displayName: string
@@ -34,15 +22,14 @@ interface ProgressData {
 export default function StudentDashboard() {
     const { user } = useAuthStore()
     const navigate = useNavigate()
-    const [progress, setProgress] = useState<ProgressData | null>(null)
-    const [isLoading, setIsLoading] = useState(true)
-
-    useEffect(() => {
-        api.get('/progress/me')
-            .then(res => setProgress(res.data))
-            .catch(() => { /* show zeros */ })
-            .finally(() => setIsLoading(false))
-    }, [])
+    const { data: progress, isLoading } = useQuery<ProgressData>({
+        queryKey: ['progress', 'me'],
+        queryFn: async () => {
+            const res = await api.get('/progress/me')
+            return res.data
+        },
+        refetchInterval: 3000 // Live update progress
+    })
 
     const totalXP = progress?.totalXP ?? 0
     const level = Math.floor(totalXP / 500) + 1
@@ -122,30 +109,6 @@ export default function StudentDashboard() {
                 </div>
                 <ProgressBar value={levelXP} max={500} color="#6366F1" height={10} showPercent />
             </Card>
-
-            {/* Badges */}
-            {(progress?.badges?.length ?? 0) > 0 && (
-                <div>
-                    <h2 className="text-xl font-display font-bold text-white mb-4 flex items-center gap-2">
-                        <Trophy size={18} className="text-yellow-400" /> Your Badges
-                    </h2>
-                    <div className="flex flex-wrap gap-2">
-                        {(progress?.badges ?? []).map(badgeId => {
-                            const def = BADGE_DEFINITIONS.find(b => b.id === badgeId)
-                            if (!def) return null
-                            return (
-                                <div key={badgeId} className="flex items-center gap-2 bg-white/5 border border-brand-border rounded-xl px-3 py-2" title={def.description}>
-                                    <span className="text-lg">{def.icon}</span>
-                                    <div>
-                                        <p className="text-xs font-bold text-white">{def.label.replace(/^[^\w]+/, '')}</p>
-                                        <p className="text-[10px] text-brand-subtext">{def.description}</p>
-                                    </div>
-                                </div>
-                            )
-                        })}
-                    </div>
-                </div>
-            )}
 
             {/* SDG World Map */}
             <div>
@@ -242,8 +205,6 @@ export default function StudentDashboard() {
                 </div>
             </div>
 
-            {/* Quiz Section — only shows after user has played SDGs */}
-            <QuizSection />
         </div>
     )
 }

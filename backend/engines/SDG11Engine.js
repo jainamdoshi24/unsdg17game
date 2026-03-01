@@ -20,13 +20,13 @@ class SDG11Engine {
 
     availableActions(state) {
         return [
-            { id: 'build_transit', label: 'Build Transit Network Expansion', cost: 3_000_000 },
-            { id: 'plant_trees', label: 'Urban Greening Programme', cost: 800_000 },
-            { id: 'flood_barriers', label: 'Install Flood Defence Barriers', cost: 2_500_000 },
-            { id: 'mixed_zoning', label: 'Implement Mixed-Use Zoning', cost: 500_000 },
-            { id: 'ev_transition', label: 'Subsidise EV Transition', cost: 1_500_000 },
-            { id: 'air_monitors', label: 'Deploy Air Quality Monitors + Bans', cost: 600_000 },
-            { id: 'stormwater_mgmt', label: 'Build Stormwater Retention Basins', cost: 1_800_000 },
+            { id: 'build_transit', label: '🚇 Build Transit Network Expansion', cost: 3_000_000 },
+            { id: 'plant_trees', label: '🌳 Urban Greening Programme', cost: 800_000 },
+            { id: 'flood_barriers', label: '🌊 Install Flood Defence Barriers', cost: 2_500_000 },
+            { id: 'mixed_zoning', label: '🎯 Implement Mixed-Use Zoning', cost: 500_000 },
+            { id: 'ev_transition', label: '🎯 Subsidise EV Transition', cost: 1_500_000 },
+            { id: 'air_monitors', label: '🎯 Deploy Air Quality Monitors + Bans', cost: 600_000 },
+            { id: 'stormwater_mgmt', label: '🎯 Build Stormwater Retention Basins', cost: 1_800_000 },
         ].filter(a => a.cost <= state.budget);
     }
 

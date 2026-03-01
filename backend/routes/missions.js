@@ -37,6 +37,7 @@ function seededRandom(seed) {
     };
 }
 
+
 // ─── POST /api/missions/generate ──────────────────────────────────
 router.post('/generate', requireAuth, async (req, res) => {
     try {

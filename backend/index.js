@@ -124,13 +124,14 @@ mongoose
     })
     .then(() => {
         logger.info('MongoDB connected — sdg_quest database');
-        const server = app.listen(PORT, () =>
-            logger.info(`SDG Quest Backend running on http://localhost:${PORT}`)
-        );
+        const PORT = process.env.PORT || 5000;
+        const server = app.listen(PORT, () => {
+            logger.info(`SDG Quest Backend running on port ${PORT}`);
+        });
 
         // Graceful shutdown
         const shutdown = (signal) => {
-            console.log(`\n${signal} received — shutting down gracefully...`);
+            console.log(`\n${signal} received — shutting down...`);
             server.close(() => {
                 mongoose.connection.close(false, () => {
                     console.log('MongoDB connection closed.');

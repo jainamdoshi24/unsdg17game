@@ -24,7 +24,7 @@ interface Props {
     onComplete: (xpEarned: number, score: number, total: number) => void
 }
 
-const QUIZ_TIME_SECONDS = 12 * 60   // 12 minutes
+const QUIZ_TIME_SECONDS = 2 * 60   // 2 minutes
 
 export default function QuizModal({ sdgId, onClose, onComplete }: Props) {
     const meta = SDG_MAP[sdgId]
@@ -81,7 +81,7 @@ export default function QuizModal({ sdgId, onClose, onComplete }: Props) {
         setAnswers(prev => [...prev, { questionId: q.questionId, selectedIndex: idx }])
     }
 
-    const handleNext = useCallback(() => {
+    const handleNext = () => {
         if (currentIdx < questions.length - 1) {
             setCurrentIdx(i => i + 1)
             setSelectedIndex(null)
@@ -89,7 +89,7 @@ export default function QuizModal({ sdgId, onClose, onComplete }: Props) {
         } else {
             handleSubmit()
         }
-    }, [currentIdx, questions])
+    }
 
     const handleSubmit = async () => {
         if (isSubmitting || result) return

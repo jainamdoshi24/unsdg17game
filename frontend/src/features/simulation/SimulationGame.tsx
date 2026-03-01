@@ -11,9 +11,25 @@ import type { SdgId, SimAction } from '@/types'
 import toast from 'react-hot-toast'
 
 const TICK_MS = 3000
+class ErrorBoundary extends React.Component<{ children: any }, { hasError: boolean, error: any }> {
+    constructor(props: any) {
+        super(props)
+        this.state = { hasError: false, error: null }
+    }
+    static getDerivedStateFromError(error: any) { return { hasError: true, error } }
+    render() {
+        if (this.state.hasError) return <div className="p-10 bg-red-100 text-red-900"><h1 className="text-3xl font-bold">Crash:</h1><pre className="mt-4 bg-red-50 p-4">{this.state.error?.message}</pre><pre className="mt-2 text-xs">{this.state.error?.stack}</pre></div>
+        return this.props.children
+    }
+}
+
 const COOLDOWN_SEC = 12
 
-export default function SimulationGame() {
+export default function SimulationGameWrapper() {
+    return <ErrorBoundary><SimulationGame /></ErrorBoundary>
+}
+
+function SimulationGame() {
     const { sdgId } = useParams<{ sdgId: string }>()
     const navigate = useNavigate()
 
@@ -33,34 +49,37 @@ export default function SimulationGame() {
     const [showAbout, setShowAbout] = useState(false)
     const [gameEnded, setGameEnded] = useState(false)
 
+    const [introTab, setIntroTab] = useState<'play' | 'learn'>('play')
+    const [hasStarted, setHasStarted] = useState(false)
+
     useEffect(() => { sessionRef.current = session }, [session])
     useEffect(() => { pausedRef.current = isPaused }, [isPaused])
-
-    const meta = SDG_MAP[sdgId as SdgId]
-    const info = SDG_INFO[sdgId as SdgId]
-    const color = meta?.color ?? '#6366F1'
 
     useEffect(() => {
         if (!sdgId) return
         reset()
         setGameEnded(false)
-
-        const go = async () => {
-            setLoading(true)
-            try {
-                const s = await simService.start(sdgId as SdgId, 1)
-                setSession(s)
-                startTicks()
-            } catch {
-                toast.error('Could not start simulation. Is the backend running?')
-                navigate('/dashboard')
-            } finally {
-                setLoading(false)
-            }
-        }
-        go()
-        return () => stopTicks()
+        setHasStarted(false)
     }, [sdgId])
+
+    const meta = SDG_MAP[sdgId as SdgId]
+    const info = SDG_INFO[sdgId as SdgId]
+    const color = meta?.color ?? '#6366F1'
+
+    const startGame = async () => {
+        setLoading(true)
+        try {
+            const s = await simService.start(sdgId as SdgId, 1)
+            setSession(s)
+            setHasStarted(true)
+            startTicks()
+        } catch {
+            toast.error('Could not start simulation. Is the backend running?')
+            navigate('/dashboard')
+        } finally {
+            setLoading(false)
+        }
+    }
 
     function startTicks() {
         stopTicks()
@@ -135,34 +154,90 @@ export default function SimulationGame() {
         toast(next ? '⏸ Paused' : '▶️ Resumed!', { duration: 1000 })
     }
 
-    if (isLoading || !session) return (
+    if (isLoading) return (
         <div className="min-h-screen bg-brand-surface flex items-center justify-center">
             <LoadingScreen text={`Starting ${meta?.shortTitle ?? 'SDG'} simulation…`} />
         </div>
     )
 
+    if (!hasStarted) {
+        return (
+            <div className="min-h-screen bg-[#87CEEB] flex items-center justify-center p-4">
+                <div className="bg-[#fdf5e6] border-[8px] border-[#d4b97a] rounded-[2rem] max-w-2xl w-full p-8 shadow-2xl animate-scale-in text-center flex flex-col max-h-[90vh]">
+                    <div className="w-20 h-20 mx-auto rounded-3xl flex items-center flex-shrink-0 justify-center text-4xl mb-4 shadow-lg border-[4px] border-white/40" style={{ background: color }}>
+                        {meta?.emoji}
+                    </div>
+                    <h1 className="font-display font-black flex-shrink-0 text-3xl md:text-4xl text-[#6b5514] mb-4 uppercase tracking-wide">
+                        {meta?.title}
+                    </h1>
+
+                    <div className="flex gap-2 justify-center mb-0">
+                        <button
+                            onClick={() => setIntroTab('play')}
+                            className={`px-6 py-2 rounded-t-xl font-black text-lg border-t-4 border-x-4 transition-colors ${introTab === 'play' ? 'bg-white border-[#e3cca0] text-[#8b5a2b]' : 'bg-[#e3cca0]/40 border-transparent text-[#a87a42] hover:bg-[#e3cca0]/60'}`}>
+                            How to Play
+                        </button>
+                        <button
+                            onClick={() => setIntroTab('learn')}
+                            className={`px-6 py-2 rounded-t-xl font-black text-lg border-t-4 border-x-4 transition-colors ${introTab === 'learn' ? 'bg-white border-[#e3cca0] text-[#1e466b]' : 'bg-[#e3cca0]/40 border-transparent text-[#a87a42] hover:bg-[#e3cca0]/60'}`}>
+                            Learn
+                        </button>
+                    </div>
+
+                    <div className="bg-white border-4 border-[#e3cca0] rounded-b-2xl rounded-t-none p-4 md:p-6 text-left mb-6 shadow-inner overflow-y-auto min-h-[250px] custom-scrollbar">
+                        {introTab === 'play' ? (
+                            <>
+                                <h2 className="text-xl font-bold text-[#8b5a2b] mb-4 border-b-2 border-[#e3cca0] pb-2 flex items-center gap-2">
+                                    <HelpCircle size={24} /> Mission Briefing
+                                </h2>
+                                <p className="font-bold text-[#5c4a21] mb-3 text-lg leading-snug">
+                                    {info?.howToPlay?.objective}
+                                </p>
+                                <ul className="list-disc pl-6 text-[#5c4a21] space-y-2 font-medium mb-5">
+                                    {info?.howToPlay?.controls.map((c: string, i: number) => <li key={i}>{c}</li>)}
+                                </ul>
+                                <div className="flex flex-col gap-2 bg-[#f4e4bc] p-4 rounded-xl border-2 border-[#d4b97a]">
+                                    <p className="text-green-700 font-black flex items-center gap-2"><span>🏆 WIN:</span> <span className="font-bold">{info?.howToPlay?.winCondition}</span></p>
+                                    <p className="text-red-700 font-black flex items-center gap-2"><span>💔 LOSE:</span> <span className="font-bold">{info?.howToPlay?.loseCondition}</span></p>
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <h2 className="text-xl font-bold text-[#1e466b] mb-4 border-b-2 border-[#b8d4f0] pb-2 flex items-center gap-2">
+                                    <BookOpen size={24} /> About {meta?.shortTitle}
+                                </h2>
+                                <p className="font-bold text-[#345c81] mb-4 text-base leading-relaxed">
+                                    {info?.about?.realWorldDesc}
+                                </p>
+                                <div className="bg-[#e9f2fa] p-4 rounded-xl border-2 border-[#b8d4f0] font-semibold text-[#1e466b] text-sm mb-4">
+                                    💡 <span className="text-[#345c81]">Why it Matters:</span> {info?.about?.whyItMatters}
+                                </div>
+                                <h3 className="font-bold text-[#1e466b] mb-2 uppercase text-xs tracking-wider">Targets</h3>
+                                <ul className="list-disc pl-6 text-[#345c81] space-y-2 font-medium text-sm">
+                                    {info?.about?.subGoals.map((g: string, i: number) => <li key={i}>{g}</li>)}
+                                </ul>
+                            </>
+                        )}
+                    </div>
+
+                    <div className="flex justify-center flex-shrink-0 gap-4">
+                        <button onClick={() => navigate('/dashboard')} className="px-8 py-4 bg-[#e9d28e] border-b-[6px] border-[#b59e53] text-[#6b5514] font-black text-xl rounded-2xl hover:translate-y-1 hover:border-b-[0px] active:border-b-[0px] transition-all">
+                            Back
+                        </button>
+                        <button onClick={startGame} className="px-10 py-4 bg-[#db4b4b] border-b-[6px] border-[#9e2a2a] text-white font-black text-xl rounded-2xl hover:translate-y-1 hover:border-b-[0px] active:border-b-[0px] transition-all flex items-center gap-2">
+                            <Play fill="currentColor" size={24} /> Play Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    if (!session) return null
+
     const isTerminal = gameEnded || (session.status !== 'running' && session.status !== undefined)
 
-    const CURRENCY_THEMES: Record<string, { icon: string, name: string }> = {
-        'SDG_01': { icon: '💵', name: 'Funds' },
-        'SDG_02': { icon: '🌾', name: 'Food Supply' },
-        'SDG_03': { icon: '💊', name: 'Medical Supplies' },
-        'SDG_04': { icon: '⏳', name: 'Time & Energy' },
-        'SDG_05': { icon: '📢', name: 'Influence' },
-        'SDG_06': { icon: '💧', name: 'Clean Water' },
-        'SDG_07': { icon: '⚡', name: 'Energy Credits' },
-        'SDG_08': { icon: '🪙', name: 'Investment Capital' },
-        'SDG_09': { icon: '🏗️', name: 'Construction Materials' },
-        'SDG_10': { icon: '🤝', name: 'Public Trust' },
-        'SDG_11': { icon: '🧱', name: 'City Resources' },
-        'SDG_12': { icon: '♻️', name: 'Eco-Points' },
-        'SDG_13': { icon: '🌍', name: 'Carbon Credits' },
-        'SDG_14': { icon: '🐠', name: 'Bio-Points (Ocean)' },
-        'SDG_15': { icon: '🌲', name: 'Nature Tokens' },
-        'SDG_16': { icon: '⚖️', name: 'Political Capital' },
-        'SDG_17': { icon: '🌐', name: 'Global Connections' },
-    }
-    const currency = session ? (CURRENCY_THEMES[session.sdgId] || { icon: '🪙', name: 'Budget' }) : { icon: '🪙', name: 'Budget' }
+    const currency = { icon: '💰', name: 'Budget' }
 
     const charUrl = `https://api.dicebear.com/9.x/adventurer/svg?seed=${encodeURIComponent(meta?.shortTitle || 'hero')}&backgroundColor=transparent`
 
@@ -293,8 +368,18 @@ export default function SimulationGame() {
                                                             : 'bg-white border-[#d4b97a] hover:bg-[#fef9e7] hover:-translate-y-0.5 hover:shadow-[0_4px_6px_rgb(0,0,0,0.2)]'}`}
                                                 >
                                                     <div className="flex flex-col items-center justify-center w-full flex-1">
-                                                        <span className="text-2xl xl:text-3xl mb-1 drop-shadow-sm">{a.emoji || (a.cost > 0 ? '🛠️' : '📢')}</span>
-                                                        <span className="font-black text-[#5c4a21] text-[11px] xl:text-xs drop-shadow-sm leading-tight text-center block w-full px-1 break-words">{a.label}</span>
+                                                        <span className="text-2xl xl:text-3xl mb-1 drop-shadow-sm">
+                                                            {(() => {
+                                                                const match = a.label.match(/^([\p{Emoji_Presentation}\p{Extended_Pictographic}]+)\s*/u);
+                                                                return match ? match[1] : (a.emoji || (a.cost > 0 ? '🛠️' : '📢'));
+                                                            })()}
+                                                        </span>
+                                                        <span className="font-black text-[#5c4a21] text-[11px] xl:text-xs drop-shadow-sm leading-tight text-center block w-full px-1 break-words">
+                                                            {(() => {
+                                                                const match = a.label.match(/^([\p{Emoji_Presentation}\p{Extended_Pictographic}]+)\s*(.*)$/u);
+                                                                return match ? match[2] : a.label;
+                                                            })()}
+                                                        </span>
                                                     </div>
 
                                                     <div className="mt-1 flex flex-col w-full gap-1 items-center justify-end flex-shrink-0">
@@ -365,7 +450,7 @@ function WorldStateTasks({ state }: { state: Record<string, unknown> }) {
         if (lowered.includes('score')) return false
 
         return true
-    })
+    }).slice(0, 4)
 
     if (entries.length === 0) return <p className="text-sm text-center font-bold text-[#a87a42]">Loading tasks...</p>
 
