@@ -20,7 +20,7 @@ export default function AuthLayout() {
                             </div>
                         ))}
                     </div>
-                    <h1 className="text-5xl font-display font-black text-gradient mb-4">SDG Quest</h1>
+                    <h1 className="text-5xl font-display font-black text-gradient mb-4">Fun & Learn</h1>
                     <p className="text-brand-subtext text-lg leading-relaxed">
                         17 immersive simulations. Real consequences.<br />
                         Learn the global goals by playing them.
@@ -37,8 +37,8 @@ export default function AuthLayout() {
             <div className="w-full lg:w-1/2 flex flex-col items-center justify-center px-6 py-12">
                 <div className="w-full max-w-md">
                     <Link to="/" className="flex items-center gap-2 mb-10 group">
-                        <div className="w-9 h-9 rounded-xl bg-brand-primary flex items-center justify-center text-white font-black text-sm">SQ</div>
-                        <span className="font-display font-bold text-white text-xl group-hover:text-brand-primary transition-colors">SDG Quest</span>
+                        <div className="w-9 h-9 rounded-xl bg-brand-primary flex items-center justify-center text-white font-black text-sm">FL</div>
+                        <span className="font-display font-bold text-white text-xl group-hover:text-brand-primary transition-colors">Fun & Learn</span>
                     </Link>
                     <Outlet />
                 </div>
